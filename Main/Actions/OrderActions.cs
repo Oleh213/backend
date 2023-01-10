@@ -85,7 +85,9 @@ namespace Shop.Main.Actions
 
             _context.orders.Load();
             _context.cartItems.Load();
-            var cartOfUsers = _context.orders.Where(x => x.UserId == _userId).Include(u => u.OrderLists).FirstOrDefault();
+            var orderList = _context.orders.Where(x => x.UserId == _userId)
+                .Include(u => u.OrderLists).ThenInclude(prod => prod.Product)
+                .FirstOrDefault();
 
             Console.WriteLine();
 
