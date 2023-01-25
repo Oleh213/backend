@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Security.Claims;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
 using WebShop.Main.Conext;
+using WebShop.Main.DTO;
 using WebShop.Main.DBContext;
-using WebShop.Main.Interfaces;
+using WebShop.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Shop.Main.Actions
 {
@@ -19,52 +23,80 @@ namespace Shop.Main.Actions
     {
         private ShopContext _context;
 
-        public ProductAction(ShopContext context)
+        private Guid UserId => Guid.Parse(User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value);
+
+        public ProductAction(ShopContext context )
         {
             _context = context;
         }
 
-        [HttpGet(Name = "AddProductr")]
-        public IActionResult AddProduct(string _name, int _available, int _price, string _description, Guid _categoryId, Guid _userId)
+        [HttpPost(Name = "AddProductr")]
+        [Authorize]
+        public IActionResult AddProduct([FromBody] ProductModel model)
         {
-            var user = _context.users.FirstOrDefault(x => x.UserId == _userId);
-
-            if (user.Online == true && user.Role == UserRole.Admin && _context.categories.Any(x => x.CatId == _categoryId))
+            _context.users.Load();
+            _context.products.Load();
+            
+            if (!_context.orders.Any(x => x.UserId == UserId)) return Unauthorized();
             {
-                _context.products.Add(new Product()
+                var user = _context.users.FirstOrDefault(x => x.UserId == UserId);
+
+                if (user.Role == UserRole.Admin && _context.categories.Any(x => x.CatId == model.CategoryId))
                 {
-                    Name = _name,
-                    Available = _available,
-                    Price = _price,
-                    CategorytId = _categoryId,
-                    ProductId = Guid.NewGuid(),
-                    Description = _description,
-                });
-                _context.SaveChanges();
-                return Ok($"Product '{_name}' seccusful added by {user.Name}");
+
+                    _context.products.Add(new Product()
+                    {
+                        Name = model.Name,
+                        Available = model.Available,
+                        Price = model.Price,
+                        ProductId = Guid.NewGuid(),
+                        Description = model.Description,
+                        CategorytId = model.CategoryId,
+                        Img = model.Img,
+                    });
+                    _context.SaveChanges();
+
+                    return Ok();
+                }
+                else
+                {
+                    var resEr = new Response<string>()
+                    {
+                        IsError = true,
+                        ErrorMessage = "401",
+                        Data = $"* Error *"
+                    };
+
+                    return Unauthorized(resEr);
+                }    
             }
-            else
-                return Unauthorized($"Error! {user.Name}, You cann't do it!");
         }
 
         [HttpGet("ShowProducts")]
-        public IActionResult ShowProducts(Guid _userId, Guid _productId)
+        public IActionResult ShowProducts()
         {
-            var user = _context.users.FirstOrDefault(x => x.UserId == _userId);
+            _context.products.Load();
+            _context.categories.Load();
+            _context.cartItems.Load();
 
-            if (user.Online == true && _context.products.Any(x => x.ProductId == _productId))
+            var productDPOs = new  List<ProductDTO>();
+
+            foreach (var item in _context.products)
             {
-                var product = _context.products.FirstOrDefault(x => x.ProductId == _productId);
-
-                return Ok($"Name: {product.Name} \n Category id of this product: {product.CategorytId} \n Price: {product.Price} \n Now available: {product.Available} pcs. \n Product id: {product.ProductId} \n Descriptions: {product.Description}");
+                productDPOs.Add(new ProductDTO
+                {
+                    ProductId = item.ProductId,
+                    Price = item.Price,
+                    CategoryName = item.Category.Name,
+                    CategoryId = item.CategorytId,
+                    ProductName = item.Name,
+                    Available = item.Available,
+                    Discount = item.Discount,
+                    Description = item.Description,
+                    Img = item.Img
+                });
             }
-            else
-                return Unauthorized($"Error! {user.Name}, You cann't do it!");
+            return Ok(productDPOs);
         }
-
     }
 }
-
-
-
-

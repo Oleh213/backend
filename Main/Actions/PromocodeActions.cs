@@ -1,23 +1,16 @@
 using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebShop.Main.Conext;
 using WebShop.Main.DBContext;
 using WebShop.Main.Interfaces;
-
-
+using WebShop.Models;
 
 namespace Shop.Main.Actions
 {
-    public class PromocodeActionArgs : IActionArgs
-    {
-        public int Discount { get; set; }
-        public string? Code { get; set; }
-        public int UserId { get; set; }
-        public int ProductId { get; set; }
-    }
-
     [ApiController]
     [Route("[controller]")]
     public class PromocodeAction : ControllerBase
@@ -28,14 +21,17 @@ namespace Shop.Main.Actions
             _context = context;
         }
 
-        [HttpGet(Name = "AddPromocode")]
+            private Guid UserId => Guid.Parse(User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value);
+
+
+        [HttpPut("AddPromocode")]
         public IActionResult AddPromocode(int _discount, string _code, Guid _userId)
         {
             var user = _context.users.FirstOrDefault(z => z.UserId == _userId);
 
             if (user != null)
             {
-                if (user.Role == UserRole.Admin && user.Online)
+                if (user.Role == UserRole.Admin)
                 {
                     _context.promocodes.Add(new Promocode()
                     {
@@ -53,31 +49,24 @@ namespace Shop.Main.Actions
                 return Unauthorized($"Error {user.Name}!");
         }
 
-        //[HttpGet("UsePromocode")]
-        //public IActionResult UsePromocode(Guid _userId, string _code)
-        //{
-        //    var user = _context.users.FirstOrDefault(x => x.UserId == _userId);
+        [HttpPost("UsePromocode")]
+        [Authorize]
+        public int UsePromocode([FromBody] PromocodeModel model)
+        {
+            if (_context.promocodes.Any(x => x.Code == model.Code))
+            {
+                var promo = _context.promocodes.FirstOrDefault(x => x.Code == model.Code);
 
-        //    if (user.UserId == _userId && user.Online && _context.promocodes.Any(x => x.Code == _code))
-        //    {
-        //        var promo = _context.promocodes.FirstOrDefault(x => x.Code == _code);
-
-        //        var cart = _context.carts.FirstOrDefault(x => x.CartId == _userId);
-
-        //        if (cart.TotalPrice > promo.Discount)
-        //        {
-        //            cart.TotalPrice -= promo.Discount;
-        //        }
-        //        else
-        //            cart.TotalPrice = 0;
-
-        //        return Ok($"Promocode: {_code}, successful used!");
-        //    }
-        //    else
-        //        return Unauthorized($"Error {user.Name}!");
-
-        
+                if (promo != null)
+                {
+                    return promo.Discount;
+                }
+                else
+                    return 0;
+            }
+            else
+                return 0;
+        }
     }
 }
-
 

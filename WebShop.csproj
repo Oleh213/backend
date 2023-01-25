@@ -8,7 +8,7 @@
 
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'gdfg' " />
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -32,6 +32,12 @@
     <PackageReference Include="AutoMapper.Collection.EntityFrameworkCore" Version="9.0.0" />
     <PackageReference Include="AutoMapper.AspNetCore.OData.EFCore" Version="4.0.0" />
     <PackageReference Include="AutoMapper.Collection.EntityFramework" Version="9.0.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.25.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.13" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.2" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -53,8 +59,25 @@
     <None Remove="AutoMapper.Collection.EntityFrameworkCore" />
     <None Remove="AutoMapper.AspNetCore.OData.EFCore" />
     <None Remove="AutoMapper.Collection.EntityFramework" />
+    <None Remove="Reguests\" />
+    <None Remove="Models\" />
+    <None Remove="System.IdentityModel.Tokens.Jwt" />
+    <None Remove="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <None Remove="Microsoft.Extensions.Configuration" />
+    <None Remove="Microsoft.Extensions.Configuration.Json" />
+    <None Remove="Microsoft.Extensions.Configuration.Binder" />
+    <None Remove="System.Configuration.ConfigurationManager" />
+    <None Remove="Main\DTO\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Controllers\" />
+    <Folder Include="Reguests\" />
+    <Folder Include="Models\" />
+    <Folder Include="Main\DTO\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Auth\Auth.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
   </ItemGroup>
 </Project>

@@ -14,14 +14,15 @@ namespace WebShop.Main.Conext
 
         public UserRole Role {get;set;}
 
-        public string? Name { get; set; }
+        public string Name { get; set; }
 
-        public string? Password { get; set; }
+        public string Password { get; set; }
 
-        public bool Online { get; set; }
+        public DateTime RegistData { get; set; }
 
         public ICollection<CartItems> CartItems { get; set; }
     }
+
     public enum UserRole {
         Admin,
         User,

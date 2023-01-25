@@ -3,6 +3,10 @@ using WebShop.Main.DBContext;
 using WebShop.Main.Conext;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
+using WebShop.Models;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using WebShop.Main.DTO;
 
 namespace WebShop.Controllers;
 
@@ -14,54 +18,107 @@ public class CartItem : ControllerBase
 
     public CartItem(ShopContext context) => _context = context;
 
-    [HttpGet(Name = "CartItem")]
-    public void Get(int _count, Guid _productId, Guid _userId)
+    private Guid UserId => Guid.Parse(User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value);
+
+
+    [HttpPost(Name = "CartItem")]
+    [Authorize]
+    public IActionResult AddToCart([FromBody] CartItemModel model)
     {
-        var user = _context.users.Include(x => x.CartItems).FirstOrDefault(x => x.UserId == _userId);
+        var user = _context.users.Include(x => x.CartItems).FirstOrDefault(x => x.UserId == UserId);
 
         if (user != null)
         {
-            if (user.Online && _context.products.Any(x => x.ProductId == _productId))
+            if (_context.products.Any(x => x.ProductId == model.ProductId))
             {
-                var prod = _context.products.FirstOrDefault(x => x.ProductId == _productId);
-
-                if (prod.Available >= _count)
+                if(!_context.cartItems.Any(x => x.ProductId == model.ProductId && x.UserId == UserId ))
                 {
-                    int itemPrise = _count * prod.Price;
+                    var prod = _context.products.FirstOrDefault(x => x.ProductId == model.ProductId);
 
-                    _context.cartItems.Add(new CartItems
+                    if (prod.Available >= model.Count)
                     {
-                        ProductId = _productId,
-                        Count = _count,
-                        Price = itemPrise,
-                        UserId = _userId
-                    });
+                        int itemPrise = model.Count * prod.Price;
 
-                    foreach (var i in _context.products)
-                    {
-                        if (i.ProductId == _productId)
+                        _context.cartItems.Add(new CartItems
                         {
-                            i.Available -= _count;
-                        }
-                    }
+                            ProductId = model.ProductId,
+                            Count = model.Count,
+                            UserId = UserId,
+                            
+                        });
+                        _context.SaveChanges();
 
-                    _context.SaveChanges();
+                        return Ok();
+                    }
                 }
+                return BadRequest();
             }
+            return BadRequest();
+        }
+        return BadRequest();
+    }
+    [HttpGet("Show")]
+    [Authorize]
+    public IActionResult ShowCart()
+    {
+        _context.cartItems.Load();
+        _context.products.Load();
+
+        var cartOfUser = _context.cartItems.Where(x => x.UserId == UserId);
+
+        if (cartOfUser != null)
+        {
+            var newCartOfUsers = new List<CartItemDTO>();
+
+            foreach(var item in cartOfUser)
+            {
+                newCartOfUsers.Add(new CartItemDTO
+                {
+                    UserId = item.UserId,
+                    ProductId = item.ProductId,
+                    Count = item.Count,
+                    ProductName = item.Product.Name,
+                    Img = item.Product.Img,
+                    Price = item.Product.Price,
+                    Available = item.Product.Available,
+                });
+            }
+
+            return Ok(newCartOfUsers);
+        }
+        else
+        {
+            var resEr = new Response<string>()
+            {
+                IsError = true,
+                ErrorMessage = "401",
+                Data = $"* The cart is empy *"
+            };
+            return NotFound(resEr);
         }
     }
-
-    [HttpGet("Show")]
-    public void Gets(Guid _userId)
+    [HttpDelete("DellFromCart")]
+    [Authorize]
+    public IActionResult DellFromCart([FromQuery] CartItemForDell model)
     {
-
-        var user = _context.users.FirstOrDefault(x => x.UserId == _userId);
-
         _context.users.Load();
         _context.cartItems.Load();
-        var cartOfUsers = _context.users.Where(x => x.UserId == _userId).Include(u => u.CartItems).FirstOrDefault();
 
-        Console.WriteLine();
+
+        var cartOfUser = _context.cartItems.FirstOrDefault(x=> x.ProductId == model.ProductId && x.UserId == UserId );
+
+        if (cartOfUser != null)
+        {
+            _context.cartItems.Remove(cartOfUser);
+
+            _context.SaveChanges();
+
+            return Ok();
+        }
+        else
+        {
+            return NotFound();
+        }
     }
 }
 

@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+//using WebShop.Auth;
 using WebShop.Main.Conext;
 using WebShop.Main.DBContext;
 using WebShop.Main.Interfaces;
+using WebShop.Models;
 using static Azure.Core.HttpHeader;
 
 namespace Shop.Main.Actions
@@ -13,6 +16,13 @@ namespace Shop.Main.Actions
     [Route("[controller]")]
     public class RegistAction : ControllerBase
     {
+        //private readonly IOptions<AuthOptions> authOptions;
+
+
+        //public RegistAction(IOptions<AuthOptions> authOptions)
+        //{
+        //    this.authOptions = authOptions;
+        //}
 
         private ShopContext _context;
 
@@ -21,30 +31,44 @@ namespace Shop.Main.Actions
             _context = context;
         }
 
-        [HttpGet(Name = "RegistAction")]
-        public IActionResult Start(string _name, string _password)
+        [HttpPost(Name = "RegistAction")]
+        public IActionResult Start([FromBody] RegisterModel model)
         {
-            var user = _context.users.Where(s => s.Name == _name);
+            var user = _context.users.Where(s => s.Name == model.Name);
 
             if (user.Any())
             {
-                return Unauthorized("Error! Enter another name!");
+                var resEr = new Response<string>()
+                {
+                    IsError = true,
+                    ErrorMessage ="401",
+                    Data = $"* Enter another username! *"
+                };
+
+                return Unauthorized(resEr);
             }
             else
                 {
                 var id = Guid.NewGuid();
                 _context.users.Add(new User
                 {
-                    Name = _name,
-                    Password = _password,
-                    Online = false,
+                    Name = model.Name,
+                    Password = model.Password,
                     UserId = id,
-                    Role = UserRole.User
+                    Role = UserRole.Admin,
+                    RegistData = DateTime.Now
+
                 });
                 _context.SaveChanges();
 
-                return Ok($"Registration successful! {_name}, Welcome to our shop!");
-                }
+                var res = new Response<string>()
+                {
+                    IsError = false,
+                    ErrorMessage = null,
+                    Data = $"Registration successful! {model.Name}, Welcome to our shop!"
+                };
+                return Ok(res);
             }
         }
     }
+}

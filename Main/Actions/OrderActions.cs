@@ -9,6 +9,9 @@ using WebShop.Main.Context;
 using Microsoft.EntityFrameworkCore;
 using WebShop.Main.DBContext;
 using WebShop.Main.Interfaces;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using WebShop.Models;
 
 namespace Shop.Main.Actions
 {
@@ -22,75 +25,101 @@ namespace Shop.Main.Actions
             _context = context;
         }
 
-        [HttpGet("Buy")]
-        public IActionResult MakeOrder(Guid _userId, string _deliveryOptions, string _promocode)
+        private Guid UserId => Guid.Parse(User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value);
+
+        [HttpPost("Buy")]
+        [Authorize]
+        public IActionResult MakeOrder([FromBody] OrderModel model)
         {
+            _context.users.Load();
+            _context.products.Load();
+            _context.cartItems.Load();
+            
+
             var user = _context.users
-                .Where(x => x.UserId == _userId)
+                .Where(x => x.UserId == UserId)
                 .Include(u => u.CartItems)
                 .ThenInclude(ci => ci.Product)
                 .FirstOrDefault();
-             
-            
-            if (user.Online && user != null)
+
+            if (user != null)
             {
                 var products = user.CartItems.Select(ci => ci.Product);
 
-                int? totalPrice = 0;
 
-                foreach(var price in products)
+                foreach (var item in products)
                 {
-                    totalPrice += price.Price;
-                }
+                    var count = model.Cart.FirstOrDefault(ci => ci.ProductId == item.ProductId);
 
-                var promo = _context.promocodes.FirstOrDefault(x => x.Code == _promocode);
-
-                if (promo != null)
-                {
-                    totalPrice -= promo.Discount;
+                    if (item.Available < count.Count)
+                    {
+                        return NotFound($"{user.Name} Error, count is no avialable!");
+                    }
+                    else
+                    {
+                        foreach (var i in _context.products)
+                        {
+                            if (i.ProductId == item.ProductId)
+                            {
+                                i.Available -= count.Count;
+                            }
+                        }
+                    }
                 }
 
                 var newOrder = new Order()
                 {
                     UserId = user.UserId,
-                    TotalPrice = totalPrice,
-                    DeliveryOptions = _deliveryOptions
+                    TotalPrice = model.TotalPrice,
+                    OrderTime = DateTime.Now,
+                    DeliveryOptions = "Delivery Options"
+                    
                 };
                 _context.orders.Add(newOrder);
 
-                _context.SaveChanges();
-                
+
                 foreach (var product in products)
                 {
+                    var count = model.Cart.FirstOrDefault(x => x.ProductId == product.ProductId);
+
                     _context.orderLists.Add(new OrderList
                     {
                         Product = product,
-                        Order = newOrder
-                    });
-                  
+                        Order = newOrder,
+                        Count = count.Count,
+                        Name = product.Name,
+                        Img = product.Img,
+                        Price = product.Price
+                    }); ;
+
+
+                    foreach (var i in _context.cartItems)
+                    {
+                        if (i.UserId == UserId)
+                        {
+                            _context.cartItems.Remove(i);
+                        }
+                    }
                 }
-
                 _context.SaveChanges();
-
                 return Ok($"{user.Name}, You successful bought!");
+
             }
             else
                 return Unauthorized($"{user.Name} Error!");
         }
 
+        [Authorize]
         [HttpGet("ShowBuyList")]
-        public void ShowBuyList(Guid _userId)
+        public IActionResult ShowBuyList()
         {
-            var user = _context.orders.FirstOrDefault(x => x.UserId == _userId);
-
             _context.orders.Load();
-            _context.cartItems.Load();
-            var orderList = _context.orders.Where(x => x.UserId == _userId)
-                .Include(u => u.OrderLists).ThenInclude(prod => prod.Product)
-                .FirstOrDefault();
+            _context.orderLists.Load();
+            if (!_context.orders.Any(x => x.UserId == UserId)) return Ok(Enumerable.Empty<Order>());
 
-            Console.WriteLine();
+            var orderedProductIds = _context.orders.Where(id => id.UserId == UserId).Include(x=> x.OrderLists).ToList();
 
+            return Ok(orderedProductIds);
         }
     }
 }

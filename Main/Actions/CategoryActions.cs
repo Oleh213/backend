@@ -22,7 +22,7 @@ namespace Shop.Main.Actions
             _context = context;
         }
 
-        [HttpGet(Name = "AddCategory")]
+        [HttpPut(Name = "AddCategory")]
         public IActionResult AddCategory(Guid _userId, string _name)
         {
 
@@ -30,7 +30,7 @@ namespace Shop.Main.Actions
             {
                 var user = _context.users.FirstOrDefault(x => x.UserId == _userId);
 
-                if ((user.Role == UserRole.Admin) && (user.Online == true))
+                if (user.Role == UserRole.Admin)
                 {
 
                     _context.categories.Add(new Category { Name = _name, CatId = Guid.NewGuid() });
@@ -50,7 +50,7 @@ namespace Shop.Main.Actions
         {
             var user = _context.users.FirstOrDefault(x => x.UserId == _userId);
 
-            if (user.Online && !_context.categories.Any())
+            if (!_context.categories.Any())
             {
                 foreach (Category items in _context.categories)
                 {

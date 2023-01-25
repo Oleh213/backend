@@ -22,6 +22,7 @@ namespace WebShop.Main.DBContext
 
         public DbSet<Order> orders { get; set; }
 
+
         public DbSet<Promocode> promocodes { get; set;}
 
         public DbSet<CartItems> cartItems { get; set; }
@@ -33,14 +34,12 @@ namespace WebShop.Main.DBContext
             modelBuilder.Entity<CartItems>()
                 .HasOne(x => x.User)
                 .WithMany(p => p.CartItems)
-                .IsRequired()
                 .HasForeignKey(p => p.UserId);
 
             modelBuilder.Entity<CartItems>()
                 .HasOne(x => x.Product)
-                .WithOne()
-                .IsRequired()
-                .HasForeignKey<CartItems>(p => p.ProductId);
+                .WithMany(x=> x.CartItems)
+                .HasForeignKey(p => p.ProductId);
 
 
             modelBuilder.Entity<Category>()
@@ -58,12 +57,9 @@ namespace WebShop.Main.DBContext
 
             modelBuilder.Entity<OrderList>()
                 .HasOne(x => x.Product)
-                .WithOne()
+                .WithMany()
                 .IsRequired()
-                .HasForeignKey<OrderList>(x => x.ProductId);
-
-
-
+                .HasForeignKey(x => x.ProductId);
 
             modelBuilder.Entity<User>().HasKey(s => new { s.UserId });
 
@@ -73,7 +69,7 @@ namespace WebShop.Main.DBContext
 
             modelBuilder.Entity<Product>().HasKey(s => new { s.ProductId });
             
-            modelBuilder.Entity<CartItems>().HasKey(s => new { s.ProductId });
+            modelBuilder.Entity<CartItems>().HasKey(s => new { s.CartItemsId });
 
             modelBuilder.Entity<Category>().HasKey(s => new { s.CatId });
         }

@@ -18,7 +18,7 @@ namespace Shop.Main.Actions
         {
             _context = context;
         }
-        [HttpGet(Name = "AddAdmin")]
+        [HttpPut(Name = "AddAdmin")]
         public IActionResult AddAdmin(Guid _userId)
         {
             var user = _context.users.FirstOrDefault(x => x.UserId == _userId);

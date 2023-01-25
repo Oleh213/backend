@@ -17,26 +17,29 @@ namespace WebShop.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.1")
+                .HasAnnotation("ProductVersion", "7.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("WebShop.Main.Conext.CartItems", b =>
                 {
-                    b.Property<Guid>("ProductId")
+                    b.Property<Guid>("CartItemsId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Count")
                         .HasColumnType("int");
 
-                    b.Property<int>("Price")
-                        .HasColumnType("int");
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("ProductId");
+                    b.HasKey("CartItemsId");
+
+                    b.HasIndex("ProductId");
 
                     b.HasIndex("UserId");
 
@@ -45,11 +48,12 @@ namespace WebShop.Migrations
 
             modelBuilder.Entity("WebShop.Main.Conext.Category", b =>
                 {
-                    b.Property<Guid?>("CatId")
+                    b.Property<Guid>("CatId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("CatId");
@@ -59,7 +63,7 @@ namespace WebShop.Migrations
 
             modelBuilder.Entity("WebShop.Main.Conext.Order", b =>
                 {
-                    b.Property<Guid?>("OrderId")
+                    b.Property<Guid>("OrderId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -67,10 +71,16 @@ namespace WebShop.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("TotalPrice")
+                    b.Property<DateTime>("OrderTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TotalPrice")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("UserId")
+                    b.Property<string>("UsedPromocode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("OrderId");
@@ -80,20 +90,32 @@ namespace WebShop.Migrations
 
             modelBuilder.Entity("WebShop.Main.Conext.Product", b =>
                 {
-                    b.Property<Guid?>("ProductId")
+                    b.Property<Guid>("ProductId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("Available")
+                    b.Property<int>("Available")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("CategorytId")
+                    b.Property<Guid>("CategorytId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Discount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DiscountType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Img")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Price")
@@ -108,7 +130,7 @@ namespace WebShop.Migrations
 
             modelBuilder.Entity("WebShop.Main.Conext.Promocode", b =>
                 {
-                    b.Property<Guid?>("PromocodetId")
+                    b.Property<Guid>("PromocodetId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -130,13 +152,15 @@ namespace WebShop.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Online")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Password")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RegistData")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("Role")
                         .HasColumnType("int");
@@ -152,8 +176,22 @@ namespace WebShop.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("Count")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Img")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
@@ -162,8 +200,7 @@ namespace WebShop.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.HasIndex("ProductId")
-                        .IsUnique();
+                    b.HasIndex("ProductId");
 
                     b.ToTable("orderLists");
                 });
@@ -171,8 +208,8 @@ namespace WebShop.Migrations
             modelBuilder.Entity("WebShop.Main.Conext.CartItems", b =>
                 {
                     b.HasOne("WebShop.Main.Conext.Product", "Product")
-                        .WithOne()
-                        .HasForeignKey("WebShop.Main.Conext.CartItems", "ProductId")
+                        .WithMany("CartItems")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -207,8 +244,8 @@ namespace WebShop.Migrations
                         .IsRequired();
 
                     b.HasOne("WebShop.Main.Conext.Product", "Product")
-                        .WithOne()
-                        .HasForeignKey("WebShop.Main.Context.OrderList", "ProductId")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -225,6 +262,11 @@ namespace WebShop.Migrations
             modelBuilder.Entity("WebShop.Main.Conext.Order", b =>
                 {
                     b.Navigation("OrderLists");
+                });
+
+            modelBuilder.Entity("WebShop.Main.Conext.Product", b =>
+                {
+                    b.Navigation("CartItems");
                 });
 
             modelBuilder.Entity("WebShop.Main.Conext.User", b =>
