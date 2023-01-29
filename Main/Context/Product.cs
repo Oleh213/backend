@@ -8,7 +8,6 @@ namespace WebShop.Main.Conext
 {
     public class Product
     {
-        [Key]
         public Guid ProductId { get; set; }
 
         public int Price { get; set; }

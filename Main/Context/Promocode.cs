@@ -11,7 +11,7 @@ namespace WebShop.Main.Conext
 
         public int Discount { get; set; }
         
-        public string? Code { get; set; }
+        public string Code { get; set; }
 
     }
 }

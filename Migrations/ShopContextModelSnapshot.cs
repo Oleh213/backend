@@ -135,6 +135,7 @@ namespace WebShop.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Code")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Discount")
@@ -151,12 +152,25 @@ namespace WebShop.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Birthday")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("RegistData")
@@ -168,6 +182,37 @@ namespace WebShop.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("users");
+                });
+
+            modelBuilder.Entity("WebShop.Main.Context.DeliveryOptions", b =>
+                {
+                    b.Property<Guid>("DeliveryOptionsId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Country")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("House")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Street")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ZipCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("DeliveryOptionsId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("deliveryOptions");
                 });
 
             modelBuilder.Entity("WebShop.Main.Context.OrderList", b =>
@@ -235,6 +280,17 @@ namespace WebShop.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("WebShop.Main.Context.DeliveryOptions", b =>
+                {
+                    b.HasOne("WebShop.Main.Conext.User", "User")
+                        .WithMany("DeliveryOptions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("WebShop.Main.Context.OrderList", b =>
                 {
                     b.HasOne("WebShop.Main.Conext.Order", "Order")
@@ -272,6 +328,8 @@ namespace WebShop.Migrations
             modelBuilder.Entity("WebShop.Main.Conext.User", b =>
                 {
                     b.Navigation("CartItems");
+
+                    b.Navigation("DeliveryOptions");
                 });
 #pragma warning restore 612, 618
         }

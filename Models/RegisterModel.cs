@@ -9,6 +9,8 @@ namespace WebShop.Models
 		public string Name { get; set; }
 		[Required(ErrorMessage = "Password is required")]
 		public string Password { get; set; }
+
+		public string Email { get; set; }
 	}
 }
 

@@ -8,6 +8,8 @@ using WebShop.Main.DBContext;
 using WebShop.Main.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using static Azure.Core.HttpHeader;
+using WebShop.Main.DTO;
+using System.Data.Entity;
 
 namespace Shop.Main.Actions
 {
@@ -46,21 +48,11 @@ namespace Shop.Main.Actions
         }
 
         [HttpGet("ShowCategory")]
-        public IActionResult ShowCategory(Guid _userId)
+        public IActionResult ShowCategory()
         {
-            var user = _context.users.FirstOrDefault(x => x.UserId == _userId);
+            _context.categories.Load();
 
-            if (!_context.categories.Any())
-            {
-                foreach (Category items in _context.categories)
-                {
-                    return Unauthorized($"Category name: {items.Name} \n Category id:{items.CatId} \n -------------");
-                }
-                return Unauthorized();
-            }
-            else
-                return Unauthorized($"Error! {user.Name}, You cann't do it!");
+            return Ok(_context.categories);
         }
-
     }
 }

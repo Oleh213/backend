@@ -20,42 +20,61 @@ public class CartItem : ControllerBase
 
     private Guid UserId => Guid.Parse(User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value);
 
-
     [HttpPost(Name = "CartItem")]
     [Authorize]
     public IActionResult AddToCart([FromBody] CartItemModel model)
     {
-        var user = _context.users.Include(x => x.CartItems).FirstOrDefault(x => x.UserId == UserId);
 
-        if (user != null)
+        if (!_context.cartItems.Any(x => x.ProductId == model.ProductId && x.UserId == UserId))
         {
-            if (_context.products.Any(x => x.ProductId == model.ProductId))
+            var prod = _context.products.FirstOrDefault(x => x.ProductId == model.ProductId);
+
+            if (prod.Available >= model.Count)
             {
-                if(!_context.cartItems.Any(x => x.ProductId == model.ProductId && x.UserId == UserId ))
+                int itemPrise = model.Count * prod.Price;
+
+                _context.cartItems.Add(new CartItems
                 {
-                    var prod = _context.products.FirstOrDefault(x => x.ProductId == model.ProductId);
+                    ProductId = model.ProductId,
+                    Count = model.Count,
+                    UserId = UserId,
 
-                    if (prod.Available >= model.Count)
-                    {
-                        int itemPrise = model.Count * prod.Price;
+                });
+                _context.SaveChanges();
 
-                        _context.cartItems.Add(new CartItems
-                        {
-                            ProductId = model.ProductId,
-                            Count = model.Count,
-                            UserId = UserId,
-                            
-                        });
-                        _context.SaveChanges();
+                var res = new Response<string>()
+                {
+                    IsError = false,
+                    ErrorMessage = "",
+                    Data = "The item successful added to cart!"
+                };
 
-                        return Ok();
-                    }
-                }
-                return BadRequest();
+                return Ok(res);
             }
-            return BadRequest();
+            else
+                {
+                    var resError1 = new Response<string>()
+                    {
+                        IsError = true,
+                        ErrorMessage = "Item is unavailabel ",
+                        Data = "Sorry, the item is  unavailable."
+                    };
+
+                    return BadRequest(resError1);
+                }
         }
-        return BadRequest();
+        else
+        {
+            var resError2 = new Response<string>()
+            {
+                IsError = true,
+                ErrorMessage = "Item in cart ",
+                Data = "The item is already in your cart!"
+            };
+            return BadRequest(resError2);
+        }
+           
+    
     }
     [HttpGet("Show")]
     [Authorize]
@@ -103,7 +122,6 @@ public class CartItem : ControllerBase
     {
         _context.users.Load();
         _context.cartItems.Load();
-
 
         var cartOfUser = _context.cartItems.FirstOrDefault(x=> x.ProductId == model.ProductId && x.UserId == UserId );
 

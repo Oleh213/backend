@@ -22,6 +22,7 @@ namespace WebShop.Main.DBContext
 
         public DbSet<Order> orders { get; set; }
 
+        public DbSet<DeliveryOptions> deliveryOptions { get; set; }
 
         public DbSet<Promocode> promocodes { get; set;}
 
@@ -35,6 +36,12 @@ namespace WebShop.Main.DBContext
                 .HasOne(x => x.User)
                 .WithMany(p => p.CartItems)
                 .HasForeignKey(p => p.UserId);
+
+            modelBuilder.Entity<User>()
+                .HasMany(x => x.DeliveryOptions)
+                .WithOne(x=> x.User)
+                .HasForeignKey(key => key.UserId);
+                
 
             modelBuilder.Entity<CartItems>()
                 .HasOne(x => x.Product)
@@ -64,6 +71,8 @@ namespace WebShop.Main.DBContext
             modelBuilder.Entity<User>().HasKey(s => new { s.UserId });
 
             modelBuilder.Entity<Order>().HasKey(s => new { s.OrderId });
+
+            modelBuilder.Entity<DeliveryOptions>().HasKey(s => new { s.DeliveryOptionsId });
 
             modelBuilder.Entity<OrderList>().HasKey(s => new { s.OrderListId });
 

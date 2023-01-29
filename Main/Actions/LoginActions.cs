@@ -49,7 +49,13 @@ namespace Shop.Main.Actions
             }
             else
             {
-                return Unauthorized();
+                var resEr = new Response<string>()
+                {
+                    IsError = true,
+                    ErrorMessage = "401",
+                    Data = "Check your name or password!"
+                };
+                return Unauthorized(resEr);
             }
         }
         private User AuthenticateUser(string name, string password)

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 //using WebShop.Auth;
 using WebShop.Main.Conext;
+using WebShop.Main.Context;
 using WebShop.Main.DBContext;
 using WebShop.Main.Interfaces;
 using WebShop.Models;
@@ -34,17 +35,26 @@ namespace Shop.Main.Actions
         [HttpPost(Name = "RegistAction")]
         public IActionResult Start([FromBody] RegisterModel model)
         {
-            var user = _context.users.Where(s => s.Name == model.Name);
 
-            if (user.Any())
+            if (_context.users.Any(x=> x.Name == model.Name))
             {
                 var resEr = new Response<string>()
                 {
                     IsError = true,
-                    ErrorMessage ="401",
-                    Data = $"* Enter another username! *"
+                    ErrorMessage = "401",
+                    Data = $"Enter another username!"
                 };
+                if (_context.users.Any(x=> x.Email == model.Email))
+                {
+                    var resEr2 = new Response<string>()
+                    {
+                        IsError = true,
+                        ErrorMessage = "401",
+                        Data = $"This email connect to other user, enter other email!"
+                    };
+                    return Unauthorized(resEr2);
 
+                }
                 return Unauthorized(resEr);
             }
             else
@@ -53,10 +63,13 @@ namespace Shop.Main.Actions
                 _context.users.Add(new User
                 {
                     Name = model.Name,
+                    Email = model.Email,
                     Password = model.Password,
                     UserId = id,
-                    Role = UserRole.Admin,
-                    RegistData = DateTime.Now
+                    Role = UserRole.User,
+                    RegistData = DateTime.Now,
+                    DeliveryOptions = new List<DeliveryOptions>()
+    
 
                 });
                 _context.SaveChanges();

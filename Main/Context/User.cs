@@ -20,7 +20,18 @@ namespace WebShop.Main.Conext
 
         public DateTime RegistData { get; set; }
 
+        public string? LastName { get; set; }
+
+        public string? PhoneNumber { get; set; }
+
+        public string? Birthday { get; set; }
+
+        public string Email { get; set; }
+
+        public ICollection<DeliveryOptions> DeliveryOptions { get; set; }
+
         public ICollection<CartItems> CartItems { get; set; }
+
     }
 
     public enum UserRole {
