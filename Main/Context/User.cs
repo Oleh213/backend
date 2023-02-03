@@ -28,6 +28,8 @@ namespace WebShop.Main.Conext
 
         public string Email { get; set; }
 
+        public int AccountBalance  { get; set; }
+
         public ICollection<DeliveryOptions> DeliveryOptions { get; set; }
 
         public ICollection<CartItems> CartItems { get; set; }

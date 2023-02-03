@@ -18,8 +18,6 @@ namespace WebShop.Main.DBContext
 
         public DbSet<Product> products { get; set; }
 
-        //public DbSet<Cart> carts { get; set; }
-
         public DbSet<Order> orders { get; set; }
 
         public DbSet<DeliveryOptions> deliveryOptions { get; set; }
@@ -29,6 +27,8 @@ namespace WebShop.Main.DBContext
         public DbSet<CartItems> cartItems { get; set; }
 
         public DbSet<OrderList> orderLists { get; set; }
+
+        public DbSet<Cards> cards { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -75,6 +75,8 @@ namespace WebShop.Main.DBContext
             modelBuilder.Entity<DeliveryOptions>().HasKey(s => new { s.DeliveryOptionsId });
 
             modelBuilder.Entity<OrderList>().HasKey(s => new { s.OrderListId });
+
+            modelBuilder.Entity<Cards>().HasKey(s => new { s.CardId });
 
             modelBuilder.Entity<Product>().HasKey(s => new { s.ProductId });
             

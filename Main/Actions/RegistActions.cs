@@ -60,17 +60,17 @@ namespace Shop.Main.Actions
             else
                 {
                 var id = Guid.NewGuid();
+                _context.deliveryOptions.Add(new DeliveryOptions { UserId = id });
                 _context.users.Add(new User
                 {
                     Name = model.Name,
                     Email = model.Email,
                     Password = model.Password,
                     UserId = id,
+                    AccountBalance = 0,
                     Role = UserRole.User,
                     RegistData = DateTime.Now,
-                    DeliveryOptions = new List<DeliveryOptions>()
-    
-
+                    DeliveryOptions =  new List<DeliveryOptions>()
                 });
                 _context.SaveChanges();
 

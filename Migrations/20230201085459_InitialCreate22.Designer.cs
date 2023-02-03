@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebShop.Main.DBContext;
 
@@ -11,9 +12,11 @@ using WebShop.Main.DBContext;
 namespace WebShop.Migrations
 {
     [DbContext(typeof(ShopContext))]
-    partial class ShopContextModelSnapshot : ModelSnapshot
+    [Migration("20230201085459_InitialCreate22")]
+    partial class InitialCreate22
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -196,15 +199,13 @@ namespace WebShop.Migrations
                     b.Property<int>("Balance")
                         .HasColumnType("int");
 
-                    b.Property<string>("CardNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("CardNumber")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Cvv")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Cvv")
+                        .HasColumnType("int");
 
-                    b.Property<string>("ExpiredDate")
+                    b.Property<string>("ExpiredData")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

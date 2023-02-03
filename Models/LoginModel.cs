@@ -11,4 +11,3 @@ namespace WebShop.Models
         public string Password { get; set; }
     }
 }
-

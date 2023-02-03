@@ -47,7 +47,6 @@
     <None Remove="Microsoft.EntityFrameworkCore.SqlServer" />
     <None Remove="EntityFramework" />
     <None Remove="Microsoft.EntityFrameworkCore" />
-    <None Remove="Controllers\" />
     <None Remove="AutoMapper" />
     <None Remove="AutoMapper.Extensions.Microsoft.DependencyInjection" />
     <None Remove="AutoMapper.Collection" />
@@ -70,7 +69,6 @@
     <None Remove="Main\DTO\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Controllers\" />
     <Folder Include="Reguests\" />
     <Folder Include="Models\" />
     <Folder Include="Main\DTO\" />
