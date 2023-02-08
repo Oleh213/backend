@@ -28,19 +28,19 @@ namespace WebShop.Reguests
 
             if (user != null)
             {
-                if(user.LastName.Length == 0)
+                if(user.LastName == null)
                 {
                     user.LastName = "Not specified";
                 }
-                if(user.Email.Length == 0)
+                if(user.Email== null)
                 {
                     user.Email = "Not specified";
                 }
-                if(user.PhoneNumber.Length == 0)
+                if(user.PhoneNumber== null)
                 {
                     user.PhoneNumber = "Not specified";
                 }
-                if(user.Birthday.Length == 0)
+                if(user.Birthday == null)
                 {
                     user.Birthday = "Not specified";
                 }

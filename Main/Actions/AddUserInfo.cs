@@ -29,23 +29,53 @@ namespace WebShop.Main.Actions
 
             if (user != null)
             {
-                user.Name = model.Name;
-                user.Email = model.Email;
-                user.LastName = model.LastName;
-                user.PhoneNumber = model.PhoneNumber;
-                user.Birthday = model.Birthday;
-                _context.SaveChanges();
 
-                var res = new Response<string>()
+                var users = _context.users.Where(user=> user.Name != model.Name);
+
+                if(users.FirstOrDefault(x=> x.Name == model.Name) == null)
                 {
-                    IsError = false,
-                    ErrorMessage = "",
-                    Data = "Your information successful update"
-                };
+                    if(users.FirstOrDefault(email=> email.Email == model.Email) == null)
+                    {
+                        user.Name = model.Name;
+                        user.Email = model.Email;
+                        user.LastName = model.LastName;
+                        user.PhoneNumber = model.PhoneNumber;
+                        user.Birthday = model.Birthday;
 
-                return Ok(res);
+                        _context.SaveChanges();
+
+                        var res = new Response<string>()
+                        {
+                            IsError = false,
+                            ErrorMessage = "",
+                            Data = "Your information successful update"
+                        };
+
+                        return Ok(res);
+                    }
+                    else
+                    {
+                        var resError = new Response<string>()
+                        {
+                            IsError = true,
+                            ErrorMessage = "",
+                            Data = "Please enter another email!"
+                        };
+
+                        return NotFound(resError);
+                    }
+                }
+                else
+                {
+                    var resError = new Response<string>()
+                    {
+                        IsError = true,
+                        ErrorMessage = "",
+                        Data = "Please enter another name!"
+                    };
+                    return NotFound(resError);
+                }             
             }
-
             else
                 return Unauthorized();
         }

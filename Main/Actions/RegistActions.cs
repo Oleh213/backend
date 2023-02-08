@@ -36,26 +36,26 @@ namespace Shop.Main.Actions
         public IActionResult Start([FromBody] RegisterModel model)
         {
 
-            if (_context.users.Any(x=> x.Name == model.Name))
+            if (_context.users.Any(x => x.Name == model.Name))
             {
+
                 var resEr = new Response<string>()
                 {
                     IsError = true,
                     ErrorMessage = "401",
                     Data = $"Enter another username!"
                 };
-                if (_context.users.Any(x=> x.Email == model.Email))
-                {
-                    var resEr2 = new Response<string>()
-                    {
-                        IsError = true,
-                        ErrorMessage = "401",
-                        Data = $"This email connect to other user, enter other email!"
-                    };
-                    return Unauthorized(resEr2);
-
-                }
                 return Unauthorized(resEr);
+            }
+            else if (_context.users.Any(x => x.Email == model.Email))
+            {
+                var resEr2 = new Response<string>()
+                {
+                    IsError = true,
+                    ErrorMessage = "401",
+                    Data = $"This email connect to other user, enter other email!"
+                };
+                return Unauthorized(resEr2);
             }
             else
                 {

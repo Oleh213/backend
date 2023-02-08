@@ -30,12 +30,21 @@ namespace WebShop.Main.DBContext
 
         public DbSet<Cards> cards { get; set; }
 
+        public DbSet<Info> info { get; set; }
+
+        public DbSet<Characteristics> characteristics { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<CartItems>()
                 .HasOne(x => x.User)
                 .WithMany(p => p.CartItems)
                 .HasForeignKey(p => p.UserId);
+
+            modelBuilder.Entity<Info>()
+                .HasOne(x => x.Order)
+                .WithOne(p => p.Info)
+                .HasForeignKey<Info>(p => p.OrderId);
 
             modelBuilder.Entity<User>()
                 .HasMany(x => x.DeliveryOptions)
@@ -68,6 +77,10 @@ namespace WebShop.Main.DBContext
                 .IsRequired()
                 .HasForeignKey(x => x.ProductId);
 
+            modelBuilder.Entity<Product>()
+                .HasMany(x => x.Characteristics)
+                .WithMany(x => x.Product);
+
             modelBuilder.Entity<User>().HasKey(s => new { s.UserId });
 
             modelBuilder.Entity<Order>().HasKey(s => new { s.OrderId });
@@ -83,6 +96,10 @@ namespace WebShop.Main.DBContext
             modelBuilder.Entity<CartItems>().HasKey(s => new { s.CartItemsId });
 
             modelBuilder.Entity<Category>().HasKey(s => new { s.CatId });
+
+            modelBuilder.Entity<Info>().HasKey(s => new { s.InfoId });
+
+            modelBuilder.Entity<Characteristics>().HasKey(s => new { s.CharacteristicsId });
         }
     }
 }

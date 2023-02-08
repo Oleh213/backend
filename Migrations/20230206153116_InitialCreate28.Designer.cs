@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebShop.Main.DBContext;
 
@@ -11,9 +12,11 @@ using WebShop.Main.DBContext;
 namespace WebShop.Migrations
 {
     [DbContext(typeof(ShopContext))]
-    partial class ShopContextModelSnapshot : ModelSnapshot
+    [Migration("20230206153116_InitialCreate28")]
+    partial class InitialCreate28
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,13 +27,13 @@ namespace WebShop.Migrations
 
             modelBuilder.Entity("CharacteristicsProduct", b =>
                 {
-                    b.Property<Guid>("CharacteristicsId")
+                    b.Property<Guid>("CharacteristicsCharacteristicId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("CharacteristicsId", "ProductId");
+                    b.HasKey("CharacteristicsCharacteristicId", "ProductId");
 
                     b.HasIndex("ProductId");
 
@@ -281,7 +284,7 @@ namespace WebShop.Migrations
 
             modelBuilder.Entity("WebShop.Main.Context.Characteristics", b =>
                 {
-                    b.Property<Guid>("CharacteristicsId")
+                    b.Property<Guid>("CharacteristicId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -289,11 +292,11 @@ namespace WebShop.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CharacteristicValue")
+                    b.Property<string>("Vlue")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("CharacteristicsId");
+                    b.HasKey("CharacteristicId");
 
                     b.ToTable("characteristics");
                 });
@@ -371,7 +374,7 @@ namespace WebShop.Migrations
                 {
                     b.HasOne("WebShop.Main.Context.Characteristics", null)
                         .WithMany()
-                        .HasForeignKey("CharacteristicsId")
+                        .HasForeignKey("CharacteristicsCharacteristicId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

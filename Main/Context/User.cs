@@ -26,7 +26,7 @@ namespace WebShop.Main.Conext
 
         public string? Birthday { get; set; }
 
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         public int AccountBalance  { get; set; }
 

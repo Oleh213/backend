@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebShop.Main.DBContext;
 
@@ -11,9 +12,11 @@ using WebShop.Main.DBContext;
 namespace WebShop.Migrations
 {
     [DbContext(typeof(ShopContext))]
-    partial class ShopContextModelSnapshot : ModelSnapshot
+    [Migration("20230203155354_InitialCreate24")]
+    partial class InitialCreate24
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace WebShop.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("CharacteristicsProduct", b =>
-                {
-                    b.Property<Guid>("CharacteristicsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("CharacteristicsId", "ProductId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("CharacteristicsProduct");
-                });
 
             modelBuilder.Entity("WebShop.Main.Conext.CartItems", b =>
                 {
@@ -129,7 +117,7 @@ namespace WebShop.Migrations
                     b.HasIndex("OrderId")
                         .IsUnique();
 
-                    b.ToTable("info");
+                    b.ToTable("Info");
                 });
 
             modelBuilder.Entity("WebShop.Main.Conext.Order", b =>
@@ -226,6 +214,7 @@ namespace WebShop.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
@@ -277,25 +266,6 @@ namespace WebShop.Migrations
                     b.HasKey("CardId");
 
                     b.ToTable("cards");
-                });
-
-            modelBuilder.Entity("WebShop.Main.Context.Characteristics", b =>
-                {
-                    b.Property<Guid>("CharacteristicsId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CharacteristicName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CharacteristicValue")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("CharacteristicsId");
-
-                    b.ToTable("characteristics");
                 });
 
             modelBuilder.Entity("WebShop.Main.Context.DeliveryOptions", b =>
@@ -365,21 +335,6 @@ namespace WebShop.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("orderLists");
-                });
-
-            modelBuilder.Entity("CharacteristicsProduct", b =>
-                {
-                    b.HasOne("WebShop.Main.Context.Characteristics", null)
-                        .WithMany()
-                        .HasForeignKey("CharacteristicsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebShop.Main.Conext.Product", null)
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("WebShop.Main.Conext.CartItems", b =>

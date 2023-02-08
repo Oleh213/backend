@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using WebShop.Main.Context;
 
 namespace WebShop.Main.DTO
 {
@@ -22,6 +23,8 @@ namespace WebShop.Main.DTO
         public int Discount { get; set; }
 
         public string? Img { get; set; }
+
+        public ICollection<Characteristics> Characteristics { get; set; }
     }
 }
 

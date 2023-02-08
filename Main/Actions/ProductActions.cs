@@ -1,18 +1,18 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.IO;
+// using System.Data.Entity;
 using System.Linq;
-using System.Numerics;
-using System.Security.Claims;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
 using WebShop.Main.Conext;
-using WebShop.Main.DTO;
+using WebShop.Main.Context;
+using Microsoft.EntityFrameworkCore;
 using WebShop.Main.DBContext;
-using WebShop.Models;
+using WebShop.Main.Interfaces;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using WebShop.Models;
+using WebShop.Main.DTO;
 
 namespace Shop.Main.Actions
 {
@@ -36,6 +36,7 @@ namespace Shop.Main.Actions
         {
             _context.users.Load();
             _context.products.Load();
+            _context.characteristics.Load();
             
             if (!_context.orders.Any(x => x.UserId == UserId)) return Unauthorized();
             {
@@ -77,11 +78,12 @@ namespace Shop.Main.Actions
         {
             _context.products.Load();
             _context.categories.Load();
+            _context.characteristics.Load();
             _context.cartItems.Load();
 
-            var productDPOs = new  List<ProductDTO>();
+            var productDPOs = new List<ProductDTO>();
 
-            foreach (var item in _context.products)
+            foreach (var item in _context.products.Include(x => x.Characteristics).ToList())
             {
                 productDPOs.Add(new ProductDTO
                 {
@@ -93,7 +95,8 @@ namespace Shop.Main.Actions
                     Available = item.Available,
                     Discount = item.Discount,
                     Description = item.Description,
-                    Img = item.Img
+                    Img = item.Img,
+                    Characteristics= item.Characteristics,                   
                 });
             }
             return Ok(productDPOs);

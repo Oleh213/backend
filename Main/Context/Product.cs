@@ -29,6 +29,9 @@ namespace WebShop.Main.Conext
         public DiscountType DiscountType { get; set; }
 
         [JsonIgnore]
+        public ICollection<Characteristics> Characteristics { get; set; }
+
+        [JsonIgnore]
         public ICollection<CartItems> CartItems { get; set; }
     }
     public enum DiscountType

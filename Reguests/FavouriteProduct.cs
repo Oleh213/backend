@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using WebShop.Main.Conext;
 using WebShop.Main.DBContext;
+using WebShop.Main.DTO;
 
 namespace WebShop.Reguests
 {
@@ -16,88 +17,50 @@ namespace WebShop.Reguests
             _context = context;
         }
 
-        [HttpGet("Favourite products by count")]
-        public IActionResult Reguest(Guid _userId)
+        [HttpGet("FavouriteProductReguest")]
+        public IActionResult Reguest()
         {
-            var user = _context.users.FirstOrDefault(z => z.UserId == _userId);
+            _context.products.Load();
+            _context.categories.Load();
+            _context.cartItems.Load();
 
-            if (user != null)
+            var products = _context.orderLists.GroupBy(ol => ol.ProductId);
+
+            Dictionary<Guid, int> topProducts = new Dictionary<Guid, int>();
+
+            foreach (var item in products)
             {
-                if (user.Role == UserRole.Admin)
+                int count = 0;
+
+                item.ToList().ForEach(x =>
                 {
-                    var products = _context.orderLists.GroupBy(ol => ol.ProductId);
-
-                    Dictionary<Guid, int> topProducts = new Dictionary<Guid, int>();
-
-                    foreach(var item in products)
-                    {
-                        int sum = 0;
-
-                        item.ToList().ForEach(x =>
-                        {
-                            sum += x.Count;
-                        });
-
-                        topProducts.Add(item.Key, sum);
-                    }
-                     
-                    var list = topProducts.OrderByDescending(c => c.Value).Take(5);
-
-                    Console.WriteLine("Top 5 favourite products by count!");
-
-                    foreach (var i in list)
-                    {
-                        Console.WriteLine($"Product: {i.Key} Count: {i.Value}");
-                    }
-
-                    return Ok($"Ok");
-                }
-                else
-                    return Unauthorized($"Error {user.Name}!");
+                    count++;
+                });
+                topProducts.Add(item.Key, count);
             }
-            else
-                return Unauthorized($"Error {user.Name}!");
-        }
-        [HttpGet("Favourite products")]
-        public IActionResult Reguest2(Guid _userId)
-        {
-            var user = _context.users.FirstOrDefault(z => z.UserId == _userId);
 
-            if (user != null)
+            var list = topProducts.OrderByDescending(c => c.Value).Take(6);
+
+            var productDPOs = new List<ProductDTO>();
+
+            foreach (var item in list)
             {
-                if (user.Role == UserRole.Admin)
+                var prod = _context.products.FirstOrDefault(x => x.ProductId == item.Key);
+
+                productDPOs.Add(new ProductDTO
                 {
-                    var products = _context.orderLists.GroupBy(ol => ol.ProductId);
-
-                    Dictionary<Guid, int> topProducts = new Dictionary<Guid, int>();
-
-                    foreach (var item in products)
-                    {
-                        int count = 0;
-
-                        item.ToList().ForEach(x =>
-                        {
-                            count++;
-                        });
-                        topProducts.Add(item.Key, count);
-                    }
-
-                    var list = topProducts.OrderByDescending(c => c.Value).Take(5);
-
-                    Console.WriteLine("Top 5 favourite products by count!");
-
-                    foreach (var i in list)
-                    {
-                        Console.WriteLine($"Product: {i.Key} Count: {i.Value}");
-                    }
-
-                    return Ok($"Ok");
-                }
-                else
-                    return Unauthorized($"Error {user.Name}!");
+                    ProductId = prod.ProductId,
+                    Price = prod.Price,
+                    CategoryName = prod.Category.Name,
+                    CategoryId = prod.CategorytId,
+                    ProductName = prod.Name,
+                    Available = prod.Available,
+                    Discount = prod.Discount,
+                    Description = prod.Description,
+                    Img = prod.Img
+                });
             }
-            else
-                return Unauthorized($"Error {user.Name}!");
+            return Ok(productDPOs);
         }
     }
 }
