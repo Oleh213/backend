@@ -138,8 +138,6 @@
 /Users/oleh/Projects/WebShop/WebShop/bin/Debug/net6.0/Microsoft.Spatial.dll
 /Users/oleh/Projects/WebShop/WebShop/bin/Debug/net6.0/Mono.Reflection.dll
 /Users/oleh/Projects/WebShop/WebShop/bin/Debug/net6.0/System.Linq.Dynamic.Core.dll
-/Users/oleh/Projects/WebShop/WebShop/bin/Debug/net6.0/Auth.dll
-/Users/oleh/Projects/WebShop/WebShop/bin/Debug/net6.0/Auth.pdb
 /Users/oleh/Projects/WebShop/WebShop/bin/Debug/net6.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
 /Users/oleh/Projects/WebShop/WebShop/bin/Debug/net6.0/Microsoft.Extensions.Configuration.dll
 /Users/oleh/Projects/WebShop/WebShop/bin/Debug/net6.0/Microsoft.Extensions.Configuration.Binder.dll

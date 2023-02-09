@@ -36,7 +36,6 @@ namespace WebShop.Reguests
 
                 characteristicsDTO.Add(item.Key, list);
             }
-
             return Ok(characteristicsDTO.ToList());
           
         }
