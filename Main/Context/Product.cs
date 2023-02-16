@@ -26,13 +26,19 @@ namespace WebShop.Main.Conext
 
         public string Img { get; set; }
 
+        public int Rating { get; set; }
+
         public DiscountType DiscountType { get; set; }
 
         [JsonIgnore]
-        public ICollection<Characteristics> Characteristics { get; set; }
+        public ICollection<Characteristics>? Characteristics { get; set; }
 
         [JsonIgnore]
         public ICollection<CartItems> CartItems { get; set; }
+
+        [JsonIgnore]
+        public ICollection<ProductImages>? Images { get; set; }
+
     }
     public enum DiscountType
     {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using WebShop.Main.Context;
 
 namespace WebShop.Main.DTO
@@ -24,7 +25,18 @@ namespace WebShop.Main.DTO
 
         public string? Img { get; set; }
 
+        public int? Rating { get; set; }
+
         public ICollection<Characteristics> Characteristics { get; set; }
+
+        public ICollection<ImageDTO> Images { get; set; }
+    }
+
+    public class ImageDTO
+    {
+        public string Image { get; set; }
+
+        public string ThumbImage { get; set; }
     }
 }
 

@@ -37,6 +37,21 @@ namespace WebShop.Migrations
                     b.ToTable("CharacteristicsProduct");
                 });
 
+            modelBuilder.Entity("ProductProductImages", b =>
+                {
+                    b.Property<Guid>("ImagesImageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductsProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ImagesImageId", "ProductsProductId");
+
+                    b.HasIndex("ProductsProductId");
+
+                    b.ToTable("ProductProductImages");
+                });
+
             modelBuilder.Entity("WebShop.Main.Conext.CartItems", b =>
                 {
                     b.Property<Guid>("CartItemsId")
@@ -188,6 +203,9 @@ namespace WebShop.Migrations
                     b.Property<int>("Price")
                         .HasColumnType("int");
 
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
                     b.HasKey("ProductId");
 
                     b.HasIndex("CategorytId");
@@ -298,6 +316,36 @@ namespace WebShop.Migrations
                     b.ToTable("characteristics");
                 });
 
+            modelBuilder.Entity("WebShop.Main.Context.Coments", b =>
+                {
+                    b.Property<Guid>("ComentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte?>("Rating")
+                        .HasColumnType("tinyint");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ComentId");
+
+                    b.ToTable("coments");
+                });
+
             modelBuilder.Entity("WebShop.Main.Context.DeliveryOptions", b =>
                 {
                     b.Property<Guid>("DeliveryOptionsId")
@@ -367,6 +415,21 @@ namespace WebShop.Migrations
                     b.ToTable("orderLists");
                 });
 
+            modelBuilder.Entity("WebShop.Main.Context.ProductImages", b =>
+                {
+                    b.Property<Guid>("ImageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ImageLink")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ImageId");
+
+                    b.ToTable("productImages");
+                });
+
             modelBuilder.Entity("CharacteristicsProduct", b =>
                 {
                     b.HasOne("WebShop.Main.Context.Characteristics", null)
@@ -378,6 +441,21 @@ namespace WebShop.Migrations
                     b.HasOne("WebShop.Main.Conext.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ProductProductImages", b =>
+                {
+                    b.HasOne("WebShop.Main.Context.ProductImages", null)
+                        .WithMany()
+                        .HasForeignKey("ImagesImageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebShop.Main.Conext.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductsProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

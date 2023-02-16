@@ -31,7 +31,6 @@ namespace Shop.Main.Actions
         }
 
         [HttpPost(Name = "AddProductr")]
-        [Authorize]
         public IActionResult AddProduct([FromBody] ProductModel model)
         {
             _context.users.Load();
@@ -44,7 +43,6 @@ namespace Shop.Main.Actions
 
                 if (user.Role == UserRole.Admin && _context.categories.Any(x => x.CatId == model.CategoryId))
                 {
-
                     _context.products.Add(new Product()
                     {
                         Name = model.Name,
@@ -67,7 +65,6 @@ namespace Shop.Main.Actions
                         ErrorMessage = "401",
                         Data = $"* Error *"
                     };
-
                     return Unauthorized(resEr);
                 }    
             }

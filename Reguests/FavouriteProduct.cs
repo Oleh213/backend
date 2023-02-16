@@ -60,7 +60,7 @@ namespace WebShop.Reguests
                     Img = prod.Img
                 });
             }
-            return Ok(_context.products);
+            return Ok(productDPOs);
         }
     }
 }

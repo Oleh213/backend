@@ -34,6 +34,10 @@ namespace WebShop.Main.DBContext
 
         public DbSet<Characteristics> characteristics { get; set; }
 
+        public DbSet<ProductImages> productImages { get; set; }
+
+        public DbSet<Coments> coments { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<CartItems>()
@@ -81,6 +85,11 @@ namespace WebShop.Main.DBContext
                 .HasMany(x => x.Characteristics)
                 .WithMany(x => x.Product);
 
+            modelBuilder.Entity<ProductImages>()
+                .HasMany(X => X.Products)
+                .WithMany(x => x.Images);
+
+
             modelBuilder.Entity<User>().HasKey(s => new { s.UserId });
 
             modelBuilder.Entity<Order>().HasKey(s => new { s.OrderId });
@@ -100,6 +109,11 @@ namespace WebShop.Main.DBContext
             modelBuilder.Entity<Info>().HasKey(s => new { s.InfoId });
 
             modelBuilder.Entity<Characteristics>().HasKey(s => new { s.CharacteristicsId });
+
+            modelBuilder.Entity<ProductImages>().HasKey(s => new { s.ImageId });
+
+            modelBuilder.Entity<Coments>().HasKey(s => new { s.ComentId });
+
         }
     }
 }
