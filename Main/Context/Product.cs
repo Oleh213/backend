@@ -28,8 +28,6 @@ namespace WebShop.Main.Conext
 
         public int Rating { get; set; }
 
-        public DiscountType DiscountType { get; set; }
-
         [JsonIgnore]
         public ICollection<Characteristics>? Characteristics { get; set; }
 
@@ -39,11 +37,5 @@ namespace WebShop.Main.Conext
         [JsonIgnore]
         public ICollection<ProductImages>? Images { get; set; }
 
-    }
-    public enum DiscountType
-    {
-        None,
-        Percent,
-        Money
     }
 }

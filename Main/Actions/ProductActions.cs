@@ -37,25 +37,45 @@ namespace Shop.Main.Actions
             _context.products.Load();
             _context.characteristics.Load();
             
-            if (!_context.orders.Any(x => x.UserId == UserId)) return Unauthorized();
+            if (!_context.users.Any(x => x.UserId == UserId)) return Unauthorized();
             {
                 var user = _context.users.FirstOrDefault(x => x.UserId == UserId);
 
-                if (user.Role == UserRole.Admin && _context.categories.Any(x => x.CatId == model.CategoryId))
+                if (user.Role == UserRole.Admin)
                 {
-                    _context.products.Add(new Product()
+                    if(_context.categories.Any(x => x.CatId == model.CategoryId))
                     {
-                        Name = model.Name,
-                        Available = model.Available,
-                        Price = model.Price,
-                        ProductId = Guid.NewGuid(),
-                        Description = model.Description,
-                        CategorytId = model.CategoryId,
-                        Img = model.Img,
-                    });
-                    _context.SaveChanges();
+                        _context.products.Add(new Product()
+                        {
+                            Name = model.Name,
+                            Available = model.Available,
+                            Price = model.Price,
+                            ProductId = Guid.NewGuid(),
+                            Description = model.Description,
+                            CategorytId = model.CategoryId,
+                            Img = model.Img,
+                        });
+                        _context.SaveChanges();
 
-                    return Ok();
+                        var resOk = new Response<string>()
+                        {
+                            IsError = false,
+                            ErrorMessage = "401",
+                            Data = $"Product successfully added!"
+                        };
+                        return Ok(resOk);
+                    }
+                    else
+                    {
+                        var resEr = new Response<string>()
+                        {
+                            IsError = true,
+                            ErrorMessage = "401",
+                            Data = $"* Error, category dont't found *"
+                        };
+                        return NotFound(resEr);
+                    }
+                    
                 }
                 else
                 {
@@ -63,10 +83,90 @@ namespace Shop.Main.Actions
                     {
                         IsError = true,
                         ErrorMessage = "401",
-                        Data = $"* Error *"
+                        Data = $"* Error, you dont have permissions! *"
                     };
                     return Unauthorized(resEr);
                 }    
+            }
+        }
+
+        [HttpPatch("UpdateProduct")]
+        public IActionResult UpdateProduct([FromBody] UpdateProductModel model)
+        {
+            _context.users.Load();
+            _context.products.Load();
+
+            if (!_context.users.Any(x => x.UserId == UserId)) return Unauthorized();
+            {
+                var user = _context.users.FirstOrDefault(x => x.UserId == UserId);
+
+                if (user.Role == UserRole.Admin)
+                {
+                    if(_context.categories.Any(x => x.CatId.ToString() == model.CategoryId.ToString()))
+                    {
+                        var product = _context.products.FirstOrDefault(x => x.ProductId == model.ProductId);
+
+                        if (product != null)
+                        {
+                            product.Name = model.Name;
+                            product.Img = model.Img;
+                            product.Available = model.Available;
+                            product.CategorytId = model.CategoryId;
+                            product.Description = model.Description;
+
+                            if (product.Discount > 0)
+                            {
+                                product.Price = model.Price - product.Discount;
+                            }
+                            else
+                            {
+                                product.Price = model.Price;
+                            }
+
+                            _context.SaveChanges();
+
+                            var resOk = new Response<string>()
+                            {
+                                IsError = false,
+                                ErrorMessage = "401",
+                                Data = $"Information successfully updated!"
+                            };
+                            return Ok(resOk);
+
+                        }
+                        else
+                        {
+                            var resEr = new Response<string>()
+                            {
+                                IsError = true,
+                                ErrorMessage = "401",
+                                Data = $"* Error, product dont't found *"
+                            };
+                            return NotFound(resEr);
+                        }
+
+                    }
+                    else
+                    {
+                        var resEr = new Response<string>()
+                        {
+                            IsError = true,
+                            ErrorMessage = "401",
+                            Data = $"* Error, category dont't found *"
+                        };
+                        return NotFound(resEr);
+                    }
+                }
+                else
+                {
+                    var resEr = new Response<string>()
+                    {
+                        IsError = true,
+                        ErrorMessage = "401",
+                        Data = $"* Error, you dont have permissions! *"
+                    };
+                    return Unauthorized(resEr);
+                }
             }
         }
 

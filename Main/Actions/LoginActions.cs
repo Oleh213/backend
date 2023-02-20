@@ -15,6 +15,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.OData.UriParser;
 
+using BC = BCrypt.Net.BCrypt;
+
 namespace Shop.Main.Actions
 {
 
@@ -60,7 +62,15 @@ namespace Shop.Main.Actions
         }
         private User AuthenticateUser(string name, string password)
         {
-            return _context.users.SingleOrDefault(u => u.Name == name && u.Password == password);
+            var user = _context.users.SingleOrDefault(u => u.Name == name);
+
+            if (BC.Verify(password, user.Password))
+            {
+                user.Password = BC.HashPassword(password);
+
+                return user;
+            }
+            return null;
         }
 
         private string GenerateJWT(User user)

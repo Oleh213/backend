@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "KcA0aFmxRuIxpD4zyXvwbnbyWq+RGDbyKaY2sLV5UxP7G1TtrPor85CDvPV8mB28VTibvLo5arTePzItXWxyQQ==",
+  "dgSpecHash": "rwHxsbLvHCqWosMN7MfNXSKsx8HExRoiFlREpFbU5UMVRGjSJeA/7c5WZtE4FcoRd7nRPAZ1dJn4uls7sGuuCA==",
   "success": true,
   "projectFilePath": "/Users/oleh/Projects/WebShop/WebShop/WebShop.csproj",
   "expectedPackageFiles": [
@@ -18,6 +18,7 @@
     "/Users/oleh/.nuget/packages/automapper.extensions.microsoft.dependencyinjection/12.0.0/automapper.extensions.microsoft.dependencyinjection.12.0.0.nupkg.sha512",
     "/Users/oleh/.nuget/packages/azure.core/1.24.0/azure.core.1.24.0.nupkg.sha512",
     "/Users/oleh/.nuget/packages/azure.identity/1.6.0/azure.identity.1.6.0.nupkg.sha512",
+    "/Users/oleh/.nuget/packages/bcrypt.net-next/4.0.3/bcrypt.net-next.4.0.3.nupkg.sha512",
     "/Users/oleh/.nuget/packages/delegatedecompiler/0.28.0/delegatedecompiler.0.28.0.nupkg.sha512",
     "/Users/oleh/.nuget/packages/delegatedecompiler.entityframework/0.28.0/delegatedecompiler.entityframework.0.28.0.nupkg.sha512",
     "/Users/oleh/.nuget/packages/entityframework/6.4.4/entityframework.6.4.4.nupkg.sha512",

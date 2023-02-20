@@ -18,6 +18,7 @@
 /Users/oleh/Projects/WebShop/WebShop/obj/Release/net6.0/PubTmp/Out/AutoMapper.Extensions.Microsoft.DependencyInjection.dll
 /Users/oleh/Projects/WebShop/WebShop/obj/Release/net6.0/PubTmp/Out/Azure.Core.dll
 /Users/oleh/Projects/WebShop/WebShop/obj/Release/net6.0/PubTmp/Out/Azure.Identity.dll
+/Users/oleh/Projects/WebShop/WebShop/obj/Release/net6.0/PubTmp/Out/BCrypt.Net-Next.dll
 /Users/oleh/Projects/WebShop/WebShop/obj/Release/net6.0/PubTmp/Out/DelegateDecompiler.dll
 /Users/oleh/Projects/WebShop/WebShop/obj/Release/net6.0/PubTmp/Out/DelegateDecompiler.EntityFramework.dll
 /Users/oleh/Projects/WebShop/WebShop/obj/Release/net6.0/PubTmp/Out/EntityFramework.SqlServer.dll

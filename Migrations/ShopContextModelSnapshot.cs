@@ -189,9 +189,6 @@ namespace WebShop.Migrations
                     b.Property<int>("Discount")
                         .HasColumnType("int");
 
-                    b.Property<int>("DiscountType")
-                        .HasColumnType("int");
-
                     b.Property<string>("Img")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 //using WebShop.Auth;
@@ -10,6 +12,8 @@ using WebShop.Main.DBContext;
 using WebShop.Main.Interfaces;
 using WebShop.Models;
 using static Azure.Core.HttpHeader;
+
+using BC = BCrypt.Net.BCrypt;
 
 namespace Shop.Main.Actions
 {
@@ -59,6 +63,8 @@ namespace Shop.Main.Actions
             }
             else
                 {
+                model.Password = BC.HashPassword(model.Password);
+
                 var id = Guid.NewGuid();
                 _context.deliveryOptions.Add(new DeliveryOptions { UserId = id });
                 _context.users.Add(new User
