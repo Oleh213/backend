@@ -7,6 +7,10 @@ using Microsoft.EntityFrameworkCore.Sqlite;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Authenticate;
 using Microsoft.Extensions.Configuration;
+using WebShop.Main.BusinessLogic;
+using Shop.Main.BusinessLogic;
+using WebShop.Controllers;
+using WebShop.Main.Interfaces;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -60,6 +64,24 @@ builder.Services.AddCors(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
+// add services
+builder.Services.AddScoped<IAdminActionsBL, AddAdminActionsBL>();
+builder.Services.AddScoped<ICartItemActionsBL, CartItemActionsBL>();
+builder.Services.AddScoped<ICategoryActionsBL, CategoryActionsBL>();
+builder.Services.AddScoped<IComentsActionsBL, ComentsActionsBL>();
+builder.Services.AddScoped<IDiscountActionsBL, DiscountActionsBL>();
+builder.Services.AddScoped<IFilterActionsBL, FilterActionsBL>();
+builder.Services.AddScoped<ILogInActionsBL, LogInActionsBL>();
+builder.Services.AddScoped<IMoneyOnBalanceActionsBL, MoneyOnBalanceActionsBL>();
+builder.Services.AddScoped<IOrderActionsBL, OrderActionsBL>();
+builder.Services.AddScoped<IProductActionsBL, ProductActionsBL>();
+builder.Services.AddScoped<IPromocodeActionsBL, PromocodeActionsBL>();
+builder.Services.AddScoped<IRegistActionsBL, RegistActionsBL>();
+builder.Services.AddScoped<IUserActionsBL, UserActionsBL>();
+
+
 
 var app = builder.Build();
 

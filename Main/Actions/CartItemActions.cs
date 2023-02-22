@@ -2,56 +2,58 @@
 using WebShop.Main.DBContext;
 using WebShop.Main.Conext;
 using System.ComponentModel.DataAnnotations;
-using System.Data.Entity;
 using WebShop.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using WebShop.Main.DTO;
+using WebShop.Main.Actions;
+using WebShop.Main.Interfaces;
+using WebShop.Main.BusinessLogic;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebShop.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class CartItem : ControllerBase
+public class CartItemActions : ControllerBase
 {
     private readonly ShopContext _context;
 
-    public CartItem(ShopContext context) => _context = context;
+    private ICartItemActionsBL _cartItemActionsBL;
+
+    public CartItemActions(ShopContext context, ICartItemActionsBL cartItemActionsBL)
+    {
+        _context = context;
+        _cartItemActionsBL = cartItemActionsBL;
+    }
 
     private Guid UserId => Guid.Parse(User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value);
 
-    [HttpPost(Name = "CartItem")]
+    [HttpPost("AddToCart")]
     [Authorize]
-    public IActionResult AddToCart([FromBody] CartItemModel model)
+    public async Task<IActionResult> AddToCart([FromBody] CartItemModel model)
     {
-
-        if (!_context.cartItems.Any(x => x.ProductId == model.ProductId && x.UserId == UserId))
+        if (!await _cartItemActionsBL.CheckIfCartInProduct(model.ProductId, UserId))
         {
-            var prod = _context.products.FirstOrDefault(x => x.ProductId == model.ProductId);
+            var product = await _cartItemActionsBL.GetProduct(model.ProductId);
 
-            if (prod.Available >= model.Count)
+            if (product != null)
             {
-                int itemPrise = model.Count * prod.Price;
-
-                _context.cartItems.Add(new CartItems
+                if (product.Available >= model.Count)
                 {
-                    ProductId = model.ProductId,
-                    Count = model.Count,
-                    UserId = UserId,
 
-                });
-                _context.SaveChanges();
+                    await _cartItemActionsBL.AddProductToCart(model.ProductId, model.Count, UserId);
 
-                var res = new Response<string>()
-                {
-                    IsError = false,
-                    ErrorMessage = "",
-                    Data = "The item successful added to cart!"
-                };
+                    var res = new Response<string>()
+                    {
+                        IsError = false,
+                        ErrorMessage = "",
+                        Data = "The item successful added to cart!"
+                    };
 
-                return Ok(res);
-            }
-            else
+                    return Ok(res);
+                }
+                else
                 {
                     var resError1 = new Response<string>()
                     {
@@ -62,6 +64,9 @@ public class CartItem : ControllerBase
 
                     return BadRequest(resError1);
                 }
+            }
+            else
+                return NotFound();
         }
         else
         {
@@ -73,35 +78,17 @@ public class CartItem : ControllerBase
             };
             return BadRequest(resError2);
         }
-           
     
     }
-    [HttpGet("Show")]
+    [HttpGet("ShowCart")]
     [Authorize]
-    public IActionResult ShowCart()
+    public async Task<IActionResult> ShowCart()
     {
-        _context.cartItems.Load();
-        _context.products.Load();
-
-        var cartOfUser = _context.cartItems.Where(x => x.UserId == UserId);
+        var cartOfUser = await _cartItemActionsBL.GetCart(UserId);
 
         if (cartOfUser != null)
         {
-            var newCartOfUsers = new List<CartItemDTO>();
-
-            foreach(var item in cartOfUser)
-            {
-                newCartOfUsers.Add(new CartItemDTO
-                {
-                    UserId = item.UserId,
-                    ProductId = item.ProductId,
-                    Count = item.Count,
-                    ProductName = item.Product.Name,
-                    Img = item.Product.Img,
-                    Price = item.Product.Price,
-                    Available = item.Product.Available,
-                });
-            }
+            var newCartOfUsers =  _cartItemActionsBL.CartItemsDTO(cartOfUser);
 
             return Ok(newCartOfUsers);
         }
@@ -116,26 +103,76 @@ public class CartItem : ControllerBase
             return NotFound(resEr);
         }
     }
-    [HttpDelete("DellFromCart")]
-    [Authorize]
-    public IActionResult DellFromCart([FromQuery] CartItemForDell model)
-    {
-        _context.users.Load();
-        _context.cartItems.Load();
 
-        var cartOfUser = _context.cartItems.FirstOrDefault(x=> x.ProductId == model.ProductId && x.UserId == UserId );
+    [HttpDelete("DelItemlFromCart")]
+    [Authorize]
+    public async Task<IActionResult> DelItemlFromCart([FromQuery] CartItemForDell model)
+    {
+
+        var cartOfUser = await _cartItemActionsBL.GetCartItem(model.ProductId, UserId);
 
         if (cartOfUser != null)
         {
-            _context.cartItems.Remove(cartOfUser);
-
-            _context.SaveChanges();
+            await _cartItemActionsBL.DellCartItem(cartOfUser);
 
             return Ok();
         }
         else
         {
             return NotFound();
+        }
+    }
+
+    [HttpPost("ChangeCountOfItemInCart")]
+    public async Task<IActionResult> ChangeCountOfItemInCart([FromBody] GetCountModel model)
+    {
+        var count = await _cartItemActionsBL.GetCartItem(model.ProductId, UserId);
+
+        if (count != null)
+        {
+            var product = await _cartItemActionsBL.GetProduct(model.ProductId);
+
+            if (product.Available >= model.Count)
+            {
+                var res = new Response<string>()
+                {
+                    IsError = false,
+                    ErrorMessage = "",
+                    Data = "Your information successful update"
+                };
+                await _cartItemActionsBL.ChangeCoutOfCartItem(count, model.Count);
+
+                return Ok(res);
+            }
+            else
+            {
+                var resError = new Response<string>()
+                {
+                    IsError = true,
+                    ErrorMessage = "CountUnAvailable",
+                    Data = "Sorry, we don't have available count of this product"
+                };
+
+                return NotFound(resError);
+            }
+        }
+        else
+            return NotFound();
+    }
+
+    [HttpGet("GetCartItemCount")]
+    [Authorize]
+    public async Task<int> GetCartItemCount()
+    {
+        var cartOfUser = await _cartItemActionsBL.GetCart(UserId);
+
+        if (cartOfUser != null)
+        {
+            return cartOfUser.Count();
+        }
+        else
+        {
+            return 0;
         }
     }
 }

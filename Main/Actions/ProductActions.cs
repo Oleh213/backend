@@ -13,49 +13,39 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using WebShop.Models;
 using WebShop.Main.DTO;
+using WebShop.Main.BusinessLogic;
 
 namespace Shop.Main.Actions
 {
 
     [ApiController]
     [Route("[controller]")]
-    public class ProductAction : ControllerBase
+    public class ProductActions : ControllerBase
     {
         private ShopContext _context;
 
+        private IProductActionsBL _productActionsBL;
+
         private Guid UserId => Guid.Parse(User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value);
 
-        public ProductAction(ShopContext context )
+        public ProductActions(ShopContext context, IProductActionsBL productActionsBL)
         {
             _context = context;
+            _productActionsBL = productActionsBL;
         }
 
-        [HttpPost(Name = "AddProductr")]
-        public IActionResult AddProduct([FromBody] ProductModel model)
+        [HttpPost("AddProduct")]
+        public async Task<IActionResult> AddProduct([FromBody] ProductModel model)
         {
-            _context.users.Load();
-            _context.products.Load();
-            _context.characteristics.Load();
-            
-            if (!_context.users.Any(x => x.UserId == UserId)) return Unauthorized();
-            {
-                var user = _context.users.FirstOrDefault(x => x.UserId == UserId);
+            var user = await _productActionsBL.GetUser(UserId);
 
+            if (user!=null)
+            {
                 if (user.Role == UserRole.Admin)
                 {
-                    if(_context.categories.Any(x => x.CatId == model.CategoryId))
+                    if(await _productActionsBL.CheckCategory(model.CategoryId))
                     {
-                        _context.products.Add(new Product()
-                        {
-                            Name = model.Name,
-                            Available = model.Available,
-                            Price = model.Price,
-                            ProductId = Guid.NewGuid(),
-                            Description = model.Description,
-                            CategorytId = model.CategoryId,
-                            Img = model.Img,
-                        });
-                        _context.SaveChanges();
+                        await _productActionsBL.AddProduct(model);
 
                         var resOk = new Response<string>()
                         {
@@ -75,7 +65,6 @@ namespace Shop.Main.Actions
                         };
                         return NotFound(resEr);
                     }
-                    
                 }
                 else
                 {
@@ -88,42 +77,25 @@ namespace Shop.Main.Actions
                     return Unauthorized(resEr);
                 }    
             }
+            return Unauthorized();
         }
 
         [HttpPatch("UpdateProduct")]
-        public IActionResult UpdateProduct([FromBody] UpdateProductModel model)
+        public async Task<IActionResult> UpdateProduct([FromBody] UpdateProductModel model)
         {
-            _context.users.Load();
-            _context.products.Load();
+            var user = await _productActionsBL.GetUser(UserId);
 
-            if (!_context.users.Any(x => x.UserId == UserId)) return Unauthorized();
+            if (user != null)
             {
-                var user = _context.users.FirstOrDefault(x => x.UserId == UserId);
-
                 if (user.Role == UserRole.Admin)
                 {
-                    if(_context.categories.Any(x => x.CatId.ToString() == model.CategoryId.ToString()))
+                    if(await _productActionsBL.CheckCategory(model.CategoryId))
                     {
-                        var product = _context.products.FirstOrDefault(x => x.ProductId == model.ProductId);
+                        var product = await _productActionsBL.GetProduct(model.ProductId);
 
                         if (product != null)
                         {
-                            product.Name = model.Name;
-                            product.Img = model.Img;
-                            product.Available = model.Available;
-                            product.CategorytId = model.CategoryId;
-                            product.Description = model.Description;
-
-                            if (product.Discount > 0)
-                            {
-                                product.Price = model.Price - product.Discount;
-                            }
-                            else
-                            {
-                                product.Price = model.Price;
-                            }
-
-                            _context.SaveChanges();
+                            await _productActionsBL.UpdateProduct(model, product);
 
                             var resOk = new Response<string>()
                             {
@@ -132,7 +104,6 @@ namespace Shop.Main.Actions
                                 Data = $"Information successfully updated!"
                             };
                             return Ok(resOk);
-
                         }
                         else
                         {
@@ -144,7 +115,6 @@ namespace Shop.Main.Actions
                             };
                             return NotFound(resEr);
                         }
-
                     }
                     else
                     {
@@ -168,34 +138,38 @@ namespace Shop.Main.Actions
                     return Unauthorized(resEr);
                 }
             }
-        }
+            else return Unauthorized();
+    }
 
         [HttpGet("ShowProducts")]
         public IActionResult ShowProducts()
         {
-            _context.products.Load();
-            _context.categories.Load();
-            _context.characteristics.Load();
-            _context.cartItems.Load();
 
-            var productDPOs = new List<ProductDTO>();
+            var productDPOs = _productActionsBL.AllProductsDTO();
 
-            foreach (var item in _context.products.Include(x => x.Characteristics).ToList())
+            return Ok(productDPOs);
+        }
+
+        [HttpGet("GetOneProduct")]
+        public async Task<IActionResult> GetOneProduct([FromQuery] GetProductModel model)
+        {
+            var product = await _productActionsBL.GetOneProductWithAll(model.ProductId);
+
+            if (product != null)
             {
-                productDPOs.Add(new ProductDTO
-                {
-                    ProductId = item.ProductId,
-                    Price = item.Price,
-                    CategoryName = item.Category.Name,
-                    CategoryId = item.CategorytId,
-                    ProductName = item.Name,
-                    Available = item.Available,
-                    Discount = item.Discount,
-                    Description = item.Description,
-                    Img = item.Img,
-                    Characteristics= item.Characteristics,                   
-                });
+                var productDTO = _productActionsBL.OneProductsDTO(product);
+
+                return Ok(productDTO);
             }
+            else return NotFound();
+        }
+
+
+        [HttpGet("FavouriteProductReguest")]
+        public IActionResult FavouriteProductReguest()
+        {
+            var productDPOs = _productActionsBL.GetFavouriteProducts();
+
             return Ok(productDPOs);
         }
     }

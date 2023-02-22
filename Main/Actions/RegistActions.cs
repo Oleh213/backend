@@ -5,7 +5,6 @@ using System.Xml.Linq;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-//using WebShop.Auth;
 using WebShop.Main.Conext;
 using WebShop.Main.Context;
 using WebShop.Main.DBContext;
@@ -13,36 +12,26 @@ using WebShop.Main.Interfaces;
 using WebShop.Models;
 using static Azure.Core.HttpHeader;
 
-using BC = BCrypt.Net.BCrypt;
-
 namespace Shop.Main.Actions
 {
     [ApiController]
     [Route("[controller]")]
-    public class RegistAction : ControllerBase
+    public class RegistActions : ControllerBase
     {
-        //private readonly IOptions<AuthOptions> authOptions;
-
-
-        //public RegistAction(IOptions<AuthOptions> authOptions)
-        //{
-        //    this.authOptions = authOptions;
-        //}
-
         private ShopContext _context;
+        private IRegistActionsBL _registActionsBL;
 
-        public RegistAction(ShopContext context)
+        public RegistActions (ShopContext context, IRegistActionsBL registActionsBL)
         {
             _context = context;
+            _registActionsBL = registActionsBL;
         }
 
-        [HttpPost(Name = "RegistAction")]
-        public IActionResult Start([FromBody] RegisterModel model)
+        [HttpPost("Registration")]
+        public async Task<IActionResult> Registration([FromBody] RegisterModel model)
         {
-
-            if (_context.users.Any(x => x.Name == model.Name))
+            if (await _registActionsBL.CheckName(model.Name))
             {
-
                 var resEr = new Response<string>()
                 {
                     IsError = true,
@@ -51,7 +40,7 @@ namespace Shop.Main.Actions
                 };
                 return Unauthorized(resEr);
             }
-            else if (_context.users.Any(x => x.Email == model.Email))
+            else if (await _registActionsBL.CheckEmail(model.Email))
             {
                 var resEr2 = new Response<string>()
                 {
@@ -63,22 +52,7 @@ namespace Shop.Main.Actions
             }
             else
                 {
-                model.Password = BC.HashPassword(model.Password);
-
-                var id = Guid.NewGuid();
-                _context.deliveryOptions.Add(new DeliveryOptions { UserId = id });
-                _context.users.Add(new User
-                {
-                    Name = model.Name,
-                    Email = model.Email,
-                    Password = model.Password,
-                    UserId = id,
-                    AccountBalance = 0,
-                    Role = UserRole.User,
-                    RegistData = DateTime.Now,
-                    DeliveryOptions =  new List<DeliveryOptions>()
-                });
-                _context.SaveChanges();
+                await _registActionsBL.Regist(model.Name, model.Email, model.Password);
 
                 var res = new Response<string>()
                 {

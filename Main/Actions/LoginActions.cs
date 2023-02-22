@@ -15,34 +15,33 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.OData.UriParser;
 
-using BC = BCrypt.Net.BCrypt;
 
 namespace Shop.Main.Actions
 {
 
     [ApiController]
     [Route("[controller]")] 
-    public class LogInAction : ControllerBase  
+    public class LogInActions : ControllerBase  
     {
-        private readonly IOptions<AuthOptions> authOptions;
-
         private ShopContext _context;
 
-        public LogInAction(ShopContext context, IOptions<AuthOptions> authOptions)
+        private ILogInActionsBL _logInActionsBL;
+
+        public LogInActions(ShopContext context, ILogInActionsBL logInActionsBL)
         {
             _context = context;
-            this.authOptions = authOptions;
+
+            _logInActionsBL = logInActionsBL;
         }
 
-        [HttpPost(Name = "LogIn")]
-        public IActionResult LogIn([FromBody] LoginModule model)
+        [HttpPost("LogIn")]
+        public async Task<IActionResult> LogIn([FromBody] LoginModule model)
         {
-
-            var user = AuthenticateUser(model.Name, model.Password);
+            var user = await _logInActionsBL.AuthenticateUser(model.Name, model.Password);
 
             if (user != null)
             {
-                var token = GenerateJWT(user);
+                var token = _logInActionsBL.GenerateJWT(user);
 
                 return Ok( new
                 {
@@ -60,40 +59,7 @@ namespace Shop.Main.Actions
                 return Unauthorized(resEr);
             }
         }
-        private User AuthenticateUser(string name, string password)
-        {
-            var user = _context.users.SingleOrDefault(u => u.Name == name);
-
-            if (BC.Verify(password, user.Password))
-            {
-                user.Password = BC.HashPassword(password);
-
-                return user;
-            }
-            return null;
-        }
-
-        private string GenerateJWT(User user)
-        {
-            var authParams = authOptions.Value;
-
-            var securitykey = authParams.GetSymmetricSecuritykey();
-            var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
-            var claims = new List<Claim>() {
-                new Claim (JwtRegisteredClaimNames.Name ,user.Name),
-                new Claim (JwtRegisteredClaimNames.Sub, user.UserId.ToString())
-            };
-
-            claims.Add(new Claim("role", user.Role.ToString()));
-
-            var token = new JwtSecurityToken(authParams.Issuer,
-                authParams.Audience,
-                claims,
-                expires: DateTime.Now.AddSeconds(authParams.TokenLifetime),
-                signingCredentials: credentials);
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
+        
     }
 }
 

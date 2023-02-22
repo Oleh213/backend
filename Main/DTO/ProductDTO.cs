@@ -31,12 +31,5 @@ namespace WebShop.Main.DTO
 
         public ICollection<ImageDTO> Images { get; set; }
     }
-
-    public class ImageDTO
-    {
-        public string Image { get; set; }
-
-        public string ThumbImage { get; set; }
-    }
 }
 

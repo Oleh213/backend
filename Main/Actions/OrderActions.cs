@@ -16,35 +16,30 @@ using WebShop.Models;
 namespace Shop.Main.Actions
 {
     [ApiController]
-    [Route("OrderAction")]
-    public class OrderAction : ControllerBase
+    [Route("OrderActions")]
+    public class OrderActions : ControllerBase
     {
         private ShopContext _context;
-        public OrderAction(ShopContext context)
+
+        private IOrderActionsBL _orderActionsBL;
+
+        public OrderActions(ShopContext context, IOrderActionsBL orderActionsBL)
         {
             _context = context;
+            _orderActionsBL = orderActionsBL;
         }
 
         private Guid UserId => Guid.Parse(User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value);
 
         [HttpPost("Buy")]
         [Authorize]
-        public IActionResult MakeOrder([FromBody] OrderModel model)
+        public async Task<IActionResult> MakeOrder([FromBody] OrderModel model)
         {
-            _context.users.Load();
-            _context.products.Load();
-            _context.cartItems.Load();
-
-            var user = _context.users
-                .Where(x => x.UserId == UserId)
-                .Include(u => u.CartItems)
-                .ThenInclude(ci => ci.Product)
-                .FirstOrDefault();
-
+            var user =  await _orderActionsBL.GetUser(UserId);
 
             if (model.Card != null)
             {
-                var card = _context.cards.FirstOrDefault(x => x.CardNumber == model.Card.CardNumber && x.Cvv == model.Card.Cvv && x.ExpiredDate == model.Card.ExpiredDate);
+                var card = await _orderActionsBL.GetCartd(model.Card.CardNumber, model.Card.ExpiredDate, model.Card.Cvv);
 
                 if (card != null)
                 {
@@ -73,7 +68,6 @@ namespace Shop.Main.Actions
                     };
                     return NotFound(resError);
                 }
-
             }
             else
             {
@@ -92,88 +86,20 @@ namespace Shop.Main.Actions
                     return NotFound(resError);
                 }
             }
+            var products = user.CartItems.Select(ci => ci.Product).ToList();
 
-
-            var products = user.CartItems.Select(ci => ci.Product);
-
-
-            foreach (var item in products)
+            if (! await _orderActionsBL.CheckCountOfProducts(products, user))
             {
-
-                var count = user.CartItems.FirstOrDefault(id => id.ProductId == item.ProductId).Count;
-
-                if (item.Available <= count)
+                var resError = new Response<string>()
                 {
-                    var resError = new Response<string>()
-                    {
-                        IsError = true,
-                        ErrorMessage = "Error ",
-                        Data = $"Error, count of {item.Name} is no avialable!"
-                    };
-
-                    return NotFound(resError);
-                }
-                else
-                {
-                    foreach (var i in _context.products)
-                    {
-                        if (i.ProductId == item.ProductId)
-                        {
-                            i.Available -= count;
-                        }
-                    }
-                }
+                    IsError = true,
+                    ErrorMessage = "Error ",
+                    Data = $"Error, count of product is no avialable!"
+                };
+                return NotFound(resError);
             }
-            var id = Guid.NewGuid();
 
-            var newOrder = new Order()
-            {
-                OrderId = id,
-                UserId = user.UserId,
-                TotalPrice = model.TotalPrice,
-                OrderTime = DateTime.Now,
-                Info = new Info
-                {
-                    OrderId = id,
-                    Address = model.DeliveryOptions.Address,
-                    City = model.DeliveryOptions.City,
-                    Country = model.DeliveryOptions.Country,
-                    Region = model.DeliveryOptions.Region,
-                    ZipCode = model.DeliveryOptions.ZipCode,
-                    Address2 = model.DeliveryOptions.Address2,
-                    Name = model.contactInfo.Name,
-                    LastName = model.contactInfo.LastName,
-                    Email = model.contactInfo.Email,
-                    PhoneNumber = model.contactInfo.PhoneNumber,
-                }
-            };
-            _context.orders.Add(newOrder);
-
-            foreach (var product in products)
-            {
-                var count = user.CartItems.FirstOrDefault(id => id.ProductId == product.ProductId).Count;
-
-                _context.orderLists.Add(new OrderList
-                {
-                    Product = product,
-                    Order = newOrder,
-                    Count = count,
-                    Name = product.Name,
-                    Img = product.Img,
-                    Price = product.Price
-                }); ;
-
-                foreach (var i in _context.cartItems)
-                {
-                    if (i.UserId == UserId)
-                    {
-                        _context.cartItems.Remove(i);
-                    }
-                }
-            }
-            
-            _context.SaveChanges();
-
+            await _orderActionsBL.CreateNewOrder(products, user, model);
 
             var resOk = new Response<string>()
             {
@@ -181,20 +107,14 @@ namespace Shop.Main.Actions
                 ErrorMessage = " ",
                 Data = $"The order was successful create"
             };
-
             return Ok(resOk);
-
         }
 
         [Authorize]
         [HttpGet("ShowBuyList")]
-        public IActionResult ShowBuyList()
+        public async Task<IActionResult> ShowBuyList()
         {
-            _context.orders.Load();
-            _context.orderLists.Load();
-            if (!_context.orders.Any(x => x.UserId == UserId)) return Ok(Enumerable.Empty<Order>());
-
-            var orderedProductIds = _context.orders.Where(id => id.UserId == UserId).Include(x=> x.OrderLists).ToList().OrderByDescending(x=> x.OrderTime);
+            var orderedProductIds = await _orderActionsBL.ShowOrders(UserId);
 
             return Ok(orderedProductIds);
         }

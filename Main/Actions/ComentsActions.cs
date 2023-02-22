@@ -1,12 +1,20 @@
 ﻿using System;
-using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
+using System.Collections.Generic;
+//using System.Data.Entity;
+using System.Linq;
+using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
-using WebShop.Main.DBContext;
-using WebShop.Models;
+using WebShop.Main.Conext;
 using WebShop.Main.Context;
+using Microsoft.EntityFrameworkCore;
+using WebShop.Main.DBContext;
+using WebShop.Main.Interfaces;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using WebShop.Models;
 using WebShop.Main.DTO;
-using System.Data.Entity;
+using WebShop.Main.BusinessLogic;
+
 
 namespace WebShop.Main.Actions
 {
@@ -16,59 +24,28 @@ namespace WebShop.Main.Actions
     {
         private ShopContext _context;
 
-        public ComentsActions(ShopContext context)
+        private IComentsActionsBL _comentsActionsBL;
+
+        public ComentsActions(ShopContext context, IComentsActionsBL comentsActionsBL)
         {
             _context = context;
+            _comentsActionsBL = comentsActionsBL;
         }
 
         private Guid UserId => Guid.Parse(User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value);
 
         [HttpPost("AddComent")]
-        public IActionResult AddComent([FromBody] ComentsModel model)
+        public async Task<IActionResult> AddComent([FromBody] ComentsModel model)
         {
-            _context.users.Load();
-            _context.coments.Load();
+            var user = await _comentsActionsBL.GetUser(UserId);
 
-            var user = _context.users.FirstOrDefault(user => user.UserId == UserId);
-
-            var product = _context.products.FirstOrDefault(x => x.ProductId == model.ProductId);
+            var product = await _comentsActionsBL.GetProduct(model.ProductId);
 
             if (user != null)
             {
-                _context.coments.Add(new Coments
-                {
-                    ComentId = Guid.NewGuid(),
-                    Body = model.Body,
-                    ParentId = model.ParentId,
-                    CreatedAt = DateTime.Now,
-                    ProductId = model.ProductId,
-                    UserId = UserId,
-                    Rating = model.Rating,
-                });
+                await _comentsActionsBL.AddComent(model, UserId);
 
-                _context.SaveChanges();
-
-                int reting = 0;
-
-                int count = 0;
-
-
-                foreach(var item in _context.coments)
-                {
-                    if(item.ProductId == model.ProductId)
-                    {
-                        if(item.Rating!=null)
-                        {
-                            reting += (int)item.Rating;
-                            count++;
-                        }
-                    }
-                }
-
-                product.Rating = reting / count;
-
-                _context.SaveChanges();
-
+                await _comentsActionsBL.CountRating(product);
 
                 var ok = new Response<string>()
                 {
@@ -92,31 +69,15 @@ namespace WebShop.Main.Actions
         }
 
         [HttpGet("GetComent")]
-        public IActionResult GetComent([FromQuery] Guid ProductId)
+        public async Task<IActionResult> GetComent([FromQuery] Guid ProductId)
         {
-            _context.users.Load();
-            _context.coments.Load();
 
-            var coments = _context.coments.Where(x => x.ProductId == ProductId);
+            var coments = await _comentsActionsBL.GetComents(ProductId);
 
             if (coments != null)
             {
-                var comentsDTO = new List<ComentsDTO>();
-                foreach(var item in coments.ToList())
-                {
-                    var user = _context.users.ToList().FirstOrDefault(x => x.UserId == item.UserId);
-                    comentsDTO.Add(new ComentsDTO
-                    {
-                        Body = item.Body,
-                        UserId = item.UserId,
-                        Username = user.Name,
-                        ComentId = item.ComentId,
-                        CreatedAt = item.CreatedAt,
-                        ParentId = item.ParentId,
-                        ProductId = item.ProductId,
-                        Rating = item.Rating,
-                    });
-                }
+                var comentsDTO = _comentsActionsBL.ComentsDTO(coments);
+
                 return Ok(comentsDTO);
             }
             else
@@ -126,51 +87,14 @@ namespace WebShop.Main.Actions
         }
 
         [HttpPost("UpdateComent")]
-        public IActionResult UpdateComent([FromBody] PatchModel model)
+        public async Task<IActionResult> UpdateComent([FromBody] PatchModel model)
         {
-            _context.users.Load();
-            _context.coments.Load();
 
-            var coment = _context.coments.FirstOrDefault(x=> x.ComentId == model.ComentId);
+            var coment = await _comentsActionsBL.GetComent(model.ComentId);
 
             if(coment!=null)
             {
-                coment.Body = model.Body;
-
-                _context.SaveChanges();
-
-                return Ok("Ok");
-            }
-            else
-            {
-                return NotFound();
-            }
-        }
-        [HttpDelete("DeleteComent")]
-        public IActionResult DeleteComent([FromQuery] Guid ComentId)
-        {
-            _context.users.Load();
-            _context.coments.Load();
-
-            var coment = _context.coments.FirstOrDefault(x => x.ComentId == ComentId);
-
-            if (coment != null)
-            {
-                var child = _context.coments.Where(x => x.ParentId == ComentId);
-
-                foreach(var item in _context.coments)
-                {
-                    if (item.ParentId == ComentId)
-                    {
-                        _context.coments.Remove(item);
-                    }
-                }
-
-                _context.coments.RemoveRange(child); 
-
-                _context.coments.Remove(coment);
-
-                _context.SaveChanges();
+                await _comentsActionsBL.ChangeComent(coment, model.Body);
 
                 return Ok();
             }
@@ -179,12 +103,24 @@ namespace WebShop.Main.Actions
                 return NotFound();
             }
         }
-    }
-    public class PatchModel
-    {
-        public string Body { get; set; }
+        [HttpDelete("DeleteComent")]
+        public async Task<IActionResult> DeleteComent([FromQuery] Guid ComentId)
+        {
+            var coment = await _comentsActionsBL.GetComent(ComentId);
 
-        public Guid ComentId { get; set; }
+            if (coment != null)
+            {
+                var child = await _comentsActionsBL.GetChildComents(ComentId);
+
+                await _comentsActionsBL.RemoveComent(coment, child);
+
+                return Ok();
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
     }
 }
 
