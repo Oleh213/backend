@@ -35,6 +35,7 @@ namespace Shop.Main.Actions
         }
 
         [HttpPost("AddProduct")]
+        [Authorize]
         public async Task<IActionResult> AddProduct([FromBody] ProductModel model)
         {
             var user = await _productActionsBL.GetUser(UserId);
@@ -81,6 +82,7 @@ namespace Shop.Main.Actions
         }
 
         [HttpPatch("UpdateProduct")]
+        [Authorize]
         public async Task<IActionResult> UpdateProduct([FromBody] UpdateProductModel model)
         {
             var user = await _productActionsBL.GetUser(UserId);
@@ -171,6 +173,118 @@ namespace Shop.Main.Actions
             var productDPOs = _productActionsBL.GetFavouriteProducts();
 
             return Ok(productDPOs);
+        }
+
+        [HttpPost("AddCharacteristicsToProduct")]
+        public async Task<IActionResult> AddCharacteristicsToProduct([FromBody] AddCharacteristicsToProductModel model)
+        {
+            var user = await _productActionsBL.GetUser(UserId);
+
+            if (user != null)
+            {
+                if (user.Role == UserRole.Admin)
+                {
+                    var characteristic = await _productActionsBL.CheckCharacteristic(model.CharacteristicName, model.CharacteristicValue);
+
+                    if(characteristic !=null )
+                    {
+                        await _productActionsBL.AddCharacteristicToProduct(characteristic, model.ProductId);
+
+                        var resOk = new Response<string>()
+                        {
+                            IsError = false,
+                            ErrorMessage = "401",
+                            Data = $"Characteristic successfully added to this product!"
+                        };
+                        return Ok(resOk);
+                    }
+                    else
+                    {
+                        var resEr = new Response<string>()
+                        {
+                            IsError = true,
+                            ErrorMessage = "401",
+                            Data = $"* Error, Characteristic dont't found *"
+                        };
+                        return NotFound(resEr);
+                    }
+                }
+                else
+                {
+                    var resEr = new Response<string>()
+                    {
+                        IsError = true,
+                        ErrorMessage = "401",
+                        Data = $"* Error, you dont have permissions! *"
+                    };
+                    return Unauthorized(resEr);
+                }
+            }
+            return Unauthorized();
+        }
+
+        [HttpGet("GetCharacteristicsOfProduct")]
+        public async Task<IActionResult> GetCharacteristicsOfProduct([FromQuery] GetProductModel model)
+        {
+            var product = await _productActionsBL.GetOneProductWithAll(model.ProductId);
+
+            if (product != null)
+            {
+                var chatacteristics = _productActionsBL.GetChatacteristics(product);
+
+                var characteristicsDTO = _productActionsBL.FirlterDTO(chatacteristics);
+
+                return Ok(characteristicsDTO);
+            }
+            else return NotFound();
+        }
+
+        [HttpPost("AddNewCharacteristic")]
+        public async Task<IActionResult> AddNewCharacteristic([FromBody] AddNewCharacteristicModel model)
+        {
+            var user = await _productActionsBL.GetUser(UserId);
+
+            if (user != null)
+            {
+                if (user.Role == UserRole.Admin)
+                {
+                    var characteristic = await _productActionsBL.CheckCharacteristic(model.CharacteristicName, model.CharacteristicValue);
+
+                    if (characteristic == null)
+                    {
+                        await _productActionsBL.AddNewCharacteristic(model.CharacteristicName, model.CharacteristicValue);
+
+                        var resOk = new Response<string>()
+                        {
+                            IsError = false,
+                            ErrorMessage = "401",
+                            Data = $"New characteristic successfully added!"
+                        };
+                        return Ok(resOk);
+                    }
+                    else
+                    {
+                        var resEr = new Response<string>()
+                        {
+                            IsError = true,
+                            ErrorMessage = "401",
+                            Data = $"* Error, change another value! *"
+                        };
+                        return NotFound(resEr);
+                    }
+                }
+                else
+                {
+                    var resEr = new Response<string>()
+                    {
+                        IsError = true,
+                        ErrorMessage = "401",
+                        Data = $"* Error, you dont have permissions! *"
+                    };
+                    return Unauthorized(resEr);
+                }
+            }
+            return Unauthorized();
         }
     }
 }

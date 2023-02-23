@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Shop.Main.BusinessLogic;
 using WebShop.Main.BusinessLogic;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Shop.Main.Actions
 {
@@ -25,6 +26,7 @@ namespace Shop.Main.Actions
         }
 
         [HttpPut("AddAdmin")]
+        [Authorize]
         public async Task<IActionResult> AddAdmin(Guid _userId)
         {
           var name = await _addAdminActionsBL.AddAdmin(_userId);

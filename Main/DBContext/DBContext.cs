@@ -66,7 +66,7 @@ namespace WebShop.Main.DBContext
                 .HasMany(x => x.Products)
                 .WithOne(x => x.Category)
                 .IsRequired()
-                .HasForeignKey(x => x.CategorytId);          
+                .HasForeignKey(x => x.CategoryId);          
 
             modelBuilder.Entity<OrderList>()
                 .HasOne(x => x.Order)
@@ -89,6 +89,11 @@ namespace WebShop.Main.DBContext
                 .HasMany(X => X.Products)
                 .WithMany(x => x.Images);
 
+            modelBuilder.Entity<Coments>()
+                .HasOne(x => x.User)
+                .WithMany(x => x.Coments)
+                .HasForeignKey(p => p.UserId);
+
 
             modelBuilder.Entity<User>().HasKey(s => new { s.UserId });
 
@@ -104,7 +109,7 @@ namespace WebShop.Main.DBContext
             
             modelBuilder.Entity<CartItems>().HasKey(s => new { s.CartItemsId });
 
-            modelBuilder.Entity<Category>().HasKey(s => new { s.CatId });
+            modelBuilder.Entity<Category>().HasKey(s => new { s.CategoryId });
 
             modelBuilder.Entity<Info>().HasKey(s => new { s.InfoId });
 
@@ -113,7 +118,6 @@ namespace WebShop.Main.DBContext
             modelBuilder.Entity<ProductImages>().HasKey(s => new { s.ImageId });
 
             modelBuilder.Entity<Coments>().HasKey(s => new { s.ComentId });
-
         }
     }
 }

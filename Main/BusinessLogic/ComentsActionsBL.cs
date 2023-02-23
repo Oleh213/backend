@@ -86,17 +86,20 @@ namespace WebShop.Main.BusinessLogic
             {
                 var user = _context.users.FirstOrDefault(x => x.UserId == item.UserId);
 
-                comentsDTO.Add(new ComentsDTO
+                if(user!=null)
                 {
-                    Body = item.Body,
-                    UserId = item.UserId,
-                    Username = user.Name,
-                    ComentId = item.ComentId,
-                    CreatedAt = item.CreatedAt,
-                    ParentId = item.ParentId,
-                    ProductId = item.ProductId,
-                    Rating = item.Rating,
-                });
+                    comentsDTO.Add(new ComentsDTO
+                    {
+                        Body = item.Body,
+                        UserId = item.UserId,
+                        Username = user.Name,
+                        ComentId = item.ComentId,
+                        CreatedAt = item.CreatedAt,
+                        ParentId = item.ParentId,
+                        ProductId = item.ProductId,
+                        Rating = item.Rating,
+                    });
+                }                
             }
 
             return comentsDTO;

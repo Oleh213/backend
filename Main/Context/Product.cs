@@ -12,7 +12,7 @@ namespace WebShop.Main.Conext
 
         public int Price { get; set; }
 
-        public Guid CategorytId { get; set; }
+        public Guid CategoryId { get; set; }
 
         public string Name { get; set; }
 

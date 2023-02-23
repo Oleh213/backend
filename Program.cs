@@ -23,7 +23,7 @@ builder.Services.Configure<AuthOptions>(authOptionsConfiguration);
 // Add services to the container.
 
 builder.Services.AddDbContext<ShopContext>(options =>
-                options.UseSqlServer("Server=tcp:shop-database-main.database.windows.net,1433;Initial Catalog=Shop;Persist Security Info=False;User ID=oleh;Password=QWUngoSdd13Ss@123@;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"));
+                options.UseSqlServer("Server=tcp:anular-shop.database.windows.net,1433;Initial Catalog=project-database;Persist Security Info=False;User ID=oleg;Password=QWUngoSdd13Ss@123@;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"));
 
 builder.Services.AddControllers();
 

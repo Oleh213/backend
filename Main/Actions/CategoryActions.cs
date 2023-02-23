@@ -12,6 +12,8 @@ using WebShop.Main.DTO;
 using System.Data.Entity;
 //using WebShop.Reguests;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using WebShop.Models;
 
 namespace Shop.Main.Actions
 {
@@ -31,29 +33,46 @@ namespace Shop.Main.Actions
 
         private Guid UserId => Guid.Parse(User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value);
 
+        [Authorize]
+        [HttpPost("AddCategory")]
+        public async Task<IActionResult> AddCategory([FromBody] AddCategoryModel model)
+        {
+            var user = await _categoryActionsBL.GetUser(UserId);
 
-        //[HttpPut(Name = "AddCategory")]
-        //public IActionResult AddCategory(Guid _userId, string _name)
-        //{
+            if (user!=null)
+            {
+                if (user.Role == UserRole.Admin)
+                {
+                    if(!await _categoryActionsBL.CheckCategory(model.CategoryName))
+                    {
+                        await _categoryActionsBL.AddCategory(model.CategoryName);
 
-        //    if (!_context.categories.Any(x => x.Name == _name))
-        //    {
-        //        var user = _context.users.FirstOrDefault(x => x.UserId == _userId);
-
-        //        if (user.Role == UserRole.Admin)
-        //        {
-
-        //            _context.categories.Add(new Category { Name = _name, CatId = Guid.NewGuid() });
-        //            _context.SaveChanges();
-
-        //            return Ok($"Category seccusful aded by {user.Name}");
-        //        }
-        //        else
-        //            return Unauthorized($"Error! {user.Name}, You cann't do it!");
-        //    }
-        //    else
-        //        return Unauthorized($"Error! Category is added");
-        //}
+                        var resOk = new Response<string>()
+                        {
+                            IsError = false,
+                            ErrorMessage = "",
+                            Data = "Category was successfully added!"
+                        };
+                        return Ok(resOk);
+                    }
+                    else
+                    {
+                        var resError = new Response<string>()
+                        {
+                            IsError = true,
+                            ErrorMessage = "",
+                            Data = "Enter another name of category!"
+                        };
+                        return NotFound(resError);
+                    }
+                    
+                }
+                else
+                    return Unauthorized();
+            }
+            else
+                return Unauthorized();
+        }
 
 
         [HttpGet("GetAllCategories")]

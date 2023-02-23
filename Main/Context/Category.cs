@@ -8,7 +8,7 @@ namespace WebShop.Main.Conext
     public class Category
     {
         [Key]
-        public Guid CatId { get; set; }
+        public Guid CategoryId { get; set; }
 
         public string Name { get; set; }
 

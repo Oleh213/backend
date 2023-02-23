@@ -1,5 +1,6 @@
 ﻿using System;
 using WebShop.Main.Conext;
+using WebShop.Main.Context;
 using WebShop.Main.DTO;
 using WebShop.Models;
 
@@ -24,5 +25,15 @@ namespace WebShop.Main.Interfaces
         ProductDTO OneProductsDTO(Product product);
 
         List<ProductDTO> GetFavouriteProducts();
+
+        Task<Characteristics> CheckCharacteristic(string name, string value);
+
+        Task<string> AddNewCharacteristic(string name, string value);
+
+        Task<string> AddCharacteristicToProduct(Characteristics characteristics, Guid productId);
+
+        Dictionary<string, List<Characteristics>> GetChatacteristics(Product product);
+
+        Dictionary<string, List<string>> FirlterDTO(Dictionary<string, List<Characteristics>> chatacteristics);
     }
 }

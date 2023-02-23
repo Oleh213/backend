@@ -9,7 +9,6 @@ namespace WebShop.Main.Conext
 {
     public class User
     {
-        [Key]
         public Guid UserId {get;set;}
 
         public UserRole Role {get;set;}
@@ -33,6 +32,8 @@ namespace WebShop.Main.Conext
         public ICollection<DeliveryOptions> DeliveryOptions { get; set; }
 
         public ICollection<CartItems> CartItems { get; set; }
+
+        public ICollection<Coments> Coments { get; set; }
 
     }
 

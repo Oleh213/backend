@@ -45,6 +45,7 @@ namespace WebShop.Main.BusinessLogic
                 }
                 else
                 {
+                    product.Discount = product.Price - 1;
                     product.Price = 1;
                 }
 

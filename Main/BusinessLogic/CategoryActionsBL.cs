@@ -27,10 +27,24 @@ namespace WebShop.Main.BusinessLogic
 
             foreach (var item in _context.categories)
             {
-                categoriesDTO.Add(new CategoriesDTO { CategoryName = item.Name, CategoryId = item.CatId });
+                categoriesDTO.Add(new CategoriesDTO { CategoryName = item.Name, CategoryId = item.CategoryId });
             }
 
             return (categoriesDTO);
+        }
+
+        public async Task<string> AddCategory(string categoryName)
+        {
+            _context.categories.Add(new Category { Name = categoryName, CategoryId = Guid.NewGuid() });
+
+            await _context.SaveChangesAsync();
+
+            return "Ok";
+        }
+
+        public async Task<bool> CheckCategory(string categoryName)
+        {
+            return await _context.categories.AnyAsync(x => x.Name == categoryName);
         }
     }
 }

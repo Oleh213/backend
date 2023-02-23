@@ -35,6 +35,7 @@ namespace WebShop.Main.Actions
         private Guid UserId => Guid.Parse(User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value);
 
         [HttpPost("AddComent")]
+        [Authorize]
         public async Task<IActionResult> AddComent([FromBody] ComentsModel model)
         {
             var user = await _comentsActionsBL.GetUser(UserId);
@@ -87,12 +88,13 @@ namespace WebShop.Main.Actions
         }
 
         [HttpPost("UpdateComent")]
+        [Authorize]
         public async Task<IActionResult> UpdateComent([FromBody] PatchModel model)
         {
 
             var coment = await _comentsActionsBL.GetComent(model.ComentId);
 
-            if(coment!=null)
+            if (coment != null)
             {
                 await _comentsActionsBL.ChangeComent(coment, model.Body);
 
@@ -103,7 +105,9 @@ namespace WebShop.Main.Actions
                 return NotFound();
             }
         }
+
         [HttpDelete("DeleteComent")]
+        [Authorize]
         public async Task<IActionResult> DeleteComent([FromQuery] Guid ComentId)
         {
             var coment = await _comentsActionsBL.GetComent(ComentId);

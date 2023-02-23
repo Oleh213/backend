@@ -6,6 +6,7 @@ using WebShop.Main.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 using WebShop.Models;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebShop.Main.Actions
 {
@@ -26,6 +27,7 @@ namespace WebShop.Main.Actions
         private Guid UserId => Guid.Parse(User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value);
 
         [HttpPost("AddDiscount")]
+        [Authorize]
         public async Task<IActionResult> AddDiscount([FromBody] AddProductDiscountModel model)
         {
             var user = await _discountActionsBL.GetUser(UserId);
@@ -72,6 +74,7 @@ namespace WebShop.Main.Actions
                 return NotFound();
         }
         [HttpPost("ClearDiscount")]
+        [Authorize]
         public async Task<IActionResult> ClearDiscount([FromBody] ClearDiscountProduct model)
         {
             var user =  await _discountActionsBL.GetUser(UserId);
@@ -86,6 +89,8 @@ namespace WebShop.Main.Actions
                     {
                         if (product.Discount != 0)
                         {
+                            await _discountActionsBL.ClearDiscount(product);
+
                             var resOk = new Response<string>()
                             {
                                 IsError = false,

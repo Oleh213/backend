@@ -124,6 +124,7 @@ public class CartItemActions : ControllerBase
     }
 
     [HttpPost("ChangeCountOfItemInCart")]
+    [Authorize]
     public async Task<IActionResult> ChangeCountOfItemInCart([FromBody] GetCountModel model)
     {
         var count = await _cartItemActionsBL.GetCartItem(model.ProductId, UserId);

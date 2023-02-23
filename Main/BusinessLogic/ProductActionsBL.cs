@@ -38,7 +38,7 @@ namespace WebShop.Main.BusinessLogic
 
         public async Task<bool> CheckCategory(Guid categoryId)
         {
-            return await _context.categories.AnyAsync(x => x.CatId == categoryId);
+            return await _context.categories.AnyAsync(x => x.CategoryId == categoryId);
         }
 
         public async Task<string> AddProduct(ProductModel model)
@@ -50,7 +50,7 @@ namespace WebShop.Main.BusinessLogic
                 Price = model.Price,
                 ProductId = Guid.NewGuid(),
                 Description = model.Description,
-                CategorytId = model.CategoryId,
+                CategoryId = model.CategoryId,
                 Img = model.Img,
             });
 
@@ -64,7 +64,7 @@ namespace WebShop.Main.BusinessLogic
             product.Name = model.Name;
             product.Img = model.Img;
             product.Available = model.Available;
-            product.CategorytId = model.CategoryId;
+            product.CategoryId = model.CategoryId;
             product.Description = model.Description;
 
             if (product.Discount > 0)
@@ -97,7 +97,7 @@ namespace WebShop.Main.BusinessLogic
                     ProductId = item.ProductId,
                     Price = item.Price,
                     CategoryName = item.Category.Name,
-                    CategoryId = item.CategorytId,
+                    CategoryId = item.CategoryId,
                     ProductName = item.Name,
                     Available = item.Available,
                     Discount = item.Discount,
@@ -136,7 +136,7 @@ namespace WebShop.Main.BusinessLogic
                 ProductId = product.ProductId,
                 Price = product.Price,
                 CategoryName = product.Category.Name,
-                CategoryId = product.CategorytId,
+                CategoryId = product.CategoryId,
                 ProductName = product.Name,
                 Available = product.Available,
                 Discount = product.Discount,
@@ -183,7 +183,7 @@ namespace WebShop.Main.BusinessLogic
                     ProductId = prod.ProductId,
                     Price = prod.Price,
                     CategoryName = prod.Category.Name,
-                    CategoryId = prod.CategorytId,
+                    CategoryId = prod.CategoryId,
                     ProductName = prod.Name,
                     Available = prod.Available,
                     Discount = prod.Discount,
@@ -195,7 +195,61 @@ namespace WebShop.Main.BusinessLogic
 
         }
 
+        public async Task<Characteristics> CheckCharacteristic(string name, string value)
+        {
+            return await _context.characteristics.FirstOrDefaultAsync(x => x.CharacteristicName == name && x.CharacteristicValue == value);
+        }
 
+        public async Task<string> AddCharacteristicToProduct(Characteristics characteristics, Guid productId)
+        {
+            var product = await GetOneProductWithAll(productId);
+
+            if(product!=null)
+            {
+                if (product.Characteristics.Any(x => x.CharacteristicName == characteristics.CharacteristicName))
+                {
+                    var characteristic = product.Characteristics.FirstOrDefault(x => x.CharacteristicName == characteristics.CharacteristicName);
+
+                    product.Characteristics.Remove(characteristic);
+                    product.Characteristics.Add(characteristics);
+                }
+                else
+                {
+                    product.Characteristics.Add(characteristics);
+                }
+                await _context.SaveChangesAsync();
+            }
+            return "Ok";
+        }
+
+        public Dictionary<string, List<Characteristics>> GetChatacteristics(Product product)
+        {
+            return product.Characteristics.GroupBy(x => x.CharacteristicName).ToDictionary(g => g.Key, g => g.ToList());
+        }
+
+        public Dictionary<string, List<string>> FirlterDTO(Dictionary<string, List<Characteristics>> chatacteristics)
+        {
+            Dictionary<string, List<string>> characteristicsDTO = new Dictionary<string, List<string>>();
+
+            foreach (var item in chatacteristics)
+            {
+                List<string> list = new List<string>();
+
+                item.Value.ToList().ForEach(x => { list.Add(x.CharacteristicValue); });
+
+                characteristicsDTO.Add(item.Key, list);
+            }
+            return characteristicsDTO;
+        }
+
+        public async Task<string> AddNewCharacteristic(string name, string value)
+        {
+            _context.characteristics.Add(new Characteristics { CharacteristicName = name,CharacteristicValue = value});
+
+            await _context.SaveChangesAsync();
+
+            return "Ok";
+        }
     }
 }
 

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WebShop.Migrations
 {
     /// <inheritdoc />
-    public partial class Migration1 : Migration
+    public partial class Migrations1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,12 +30,12 @@ namespace WebShop.Migrations
                 name: "categories",
                 columns: table => new
                 {
-                    CatId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_categories", x => x.CatId);
+                    table.PrimaryKey("PK_categories", x => x.CategoryId);
                 });
 
             migrationBuilder.CreateTable(
@@ -64,6 +64,18 @@ namespace WebShop.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_orders", x => x.OrderId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "productImages",
+                columns: table => new
+                {
+                    ImageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ImageLink = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_productImages", x => x.ImageId);
                 });
 
             migrationBuilder.CreateTable(
@@ -105,22 +117,22 @@ namespace WebShop.Migrations
                 {
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Price = table.Column<int>(type: "int", nullable: false),
-                    CategorytId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Available = table.Column<int>(type: "int", nullable: false),
                     Discount = table.Column<int>(type: "int", nullable: false),
                     Img = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DiscountType = table.Column<int>(type: "int", nullable: false)
+                    Rating = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_products", x => x.ProductId);
                     table.ForeignKey(
-                        name: "FK_products_categories_CategorytId",
-                        column: x => x.CategorytId,
+                        name: "FK_products_categories_CategoryId",
+                        column: x => x.CategoryId,
                         principalTable: "categories",
-                        principalColumn: "CatId",
+                        principalColumn: "CategoryId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -149,6 +161,29 @@ namespace WebShop.Migrations
                         column: x => x.OrderId,
                         principalTable: "orders",
                         principalColumn: "OrderId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "coments",
+                columns: table => new
+                {
+                    ComentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Body = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Rating = table.Column<byte>(type: "tinyint", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_coments", x => x.ComentId);
+                    table.ForeignKey(
+                        name: "FK_coments_users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "users",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -255,6 +290,30 @@ namespace WebShop.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ProductProductImages",
+                columns: table => new
+                {
+                    ImagesImageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductsProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductProductImages", x => new { x.ImagesImageId, x.ProductsProductId });
+                    table.ForeignKey(
+                        name: "FK_ProductProductImages_productImages_ImagesImageId",
+                        column: x => x.ImagesImageId,
+                        principalTable: "productImages",
+                        principalColumn: "ImageId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProductProductImages_products_ProductsProductId",
+                        column: x => x.ProductsProductId,
+                        principalTable: "products",
+                        principalColumn: "ProductId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_cartItems_ProductId",
                 table: "cartItems",
@@ -269,6 +328,11 @@ namespace WebShop.Migrations
                 name: "IX_CharacteristicsProduct_ProductId",
                 table: "CharacteristicsProduct",
                 column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_coments_UserId",
+                table: "coments",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_deliveryOptions_UserId",
@@ -292,9 +356,14 @@ namespace WebShop.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_products_CategorytId",
+                name: "IX_ProductProductImages_ProductsProductId",
+                table: "ProductProductImages",
+                column: "ProductsProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_products_CategoryId",
                 table: "products",
-                column: "CategorytId");
+                column: "CategoryId");
         }
 
         /// <inheritdoc />
@@ -310,6 +379,9 @@ namespace WebShop.Migrations
                 name: "CharacteristicsProduct");
 
             migrationBuilder.DropTable(
+                name: "coments");
+
+            migrationBuilder.DropTable(
                 name: "deliveryOptions");
 
             migrationBuilder.DropTable(
@@ -317,6 +389,9 @@ namespace WebShop.Migrations
 
             migrationBuilder.DropTable(
                 name: "orderLists");
+
+            migrationBuilder.DropTable(
+                name: "ProductProductImages");
 
             migrationBuilder.DropTable(
                 name: "promocodes");
@@ -329,6 +404,9 @@ namespace WebShop.Migrations
 
             migrationBuilder.DropTable(
                 name: "orders");
+
+            migrationBuilder.DropTable(
+                name: "productImages");
 
             migrationBuilder.DropTable(
                 name: "products");

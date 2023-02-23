@@ -12,8 +12,8 @@ using WebShop.Main.DBContext;
 namespace WebShop.Migrations
 {
     [DbContext(typeof(ShopContext))]
-    [Migration("20230214154702_Migrations4")]
-    partial class Migrations4
+    [Migration("20230223093349_Migrations1")]
+    partial class Migrations1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -81,7 +81,7 @@ namespace WebShop.Migrations
 
             modelBuilder.Entity("WebShop.Main.Conext.Category", b =>
                 {
-                    b.Property<Guid>("CatId")
+                    b.Property<Guid>("CategoryId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -89,7 +89,7 @@ namespace WebShop.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("CatId");
+                    b.HasKey("CategoryId");
 
                     b.ToTable("categories");
                 });
@@ -182,7 +182,7 @@ namespace WebShop.Migrations
                     b.Property<int>("Available")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("CategorytId")
+                    b.Property<Guid>("CategoryId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
@@ -190,9 +190,6 @@ namespace WebShop.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Discount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DiscountType")
                         .HasColumnType("int");
 
                     b.Property<string>("Img")
@@ -206,9 +203,12 @@ namespace WebShop.Migrations
                     b.Property<int>("Price")
                         .HasColumnType("int");
 
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
                     b.HasKey("ProductId");
 
-                    b.HasIndex("CategorytId");
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("products");
                 });
@@ -335,10 +335,15 @@ namespace WebShop.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<byte?>("Rating")
+                        .HasColumnType("tinyint");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("ComentId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("coments");
                 });
@@ -491,11 +496,22 @@ namespace WebShop.Migrations
                 {
                     b.HasOne("WebShop.Main.Conext.Category", "Category")
                         .WithMany("Products")
-                        .HasForeignKey("CategorytId")
+                        .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("WebShop.Main.Context.Coments", b =>
+                {
+                    b.HasOne("WebShop.Main.Conext.User", "User")
+                        .WithMany("Coments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("WebShop.Main.Context.DeliveryOptions", b =>
@@ -549,6 +565,8 @@ namespace WebShop.Migrations
             modelBuilder.Entity("WebShop.Main.Conext.User", b =>
                 {
                     b.Navigation("CartItems");
+
+                    b.Navigation("Coments");
 
                     b.Navigation("DeliveryOptions");
                 });

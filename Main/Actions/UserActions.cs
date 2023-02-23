@@ -97,6 +97,7 @@ namespace WebShop.Main.Actions
         }
 
         [HttpPost("AddDeliveryInfo")]
+        [Authorize]
         public async Task<IActionResult> AddDeliveryInfo([FromBody] DeliveryOptionsModel model)
         {
             var user = await _userActionsBL.GetUserDeliveryInfo(UserId);
@@ -119,6 +120,7 @@ namespace WebShop.Main.Actions
         }
 
         [HttpGet("GetUser")]
+        [Authorize]
         public async Task<IActionResult> GetUser()
         {
             var user = await _userActionsBL.GetUser(UserId);
