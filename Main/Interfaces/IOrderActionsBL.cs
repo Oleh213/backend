@@ -16,6 +16,12 @@ namespace WebShop.Main.Interfaces
         Task<string> CreateNewOrder(List<Product> products, User user, OrderModel model);
 
         Task<List<Order>> ShowOrders(Guid userId);
+
+        Task<Order> GetOrder(Guid orderId);
+
+        Task<string> ChangeOrderStatus(Order order, OrderStatus orderStatus);
+
+        Task<List<Order>> GetNewOrders();
     }
 }
 

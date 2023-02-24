@@ -52,7 +52,6 @@ namespace Shop.Main.Actions
         //}
 
         [HttpPost("UsePromocode")]
-        [Authorize]
         public async Task<int> UsePromocode([FromBody] PromocodeModel model)
         {
             var promo =  await _promocodeActionsBL.GetPromocode(model.Code);

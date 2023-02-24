@@ -118,6 +118,53 @@ namespace Shop.Main.Actions
 
             return Ok(orderedProductIds);
         }
+
+
+        [HttpPost("ChangeOrderStatus")]
+        public async Task<IActionResult> ChangeOrderStatus([FromBody] ChangeOrderStatusModel model)
+        {
+            var user = await _orderActionsBL.GetUser(UserId);
+
+            if (user != null)
+            {
+                if (user.Role == UserRole.Admin || user.Role == UserRole.Manager || model.orderStatus == OrderStatus.Canceled)
+                {
+                    var order = await _orderActionsBL.GetOrder(model.OrderId);
+
+                    if (order.OrderStatus != OrderStatus.AwaitingConfirm && model.orderStatus == OrderStatus.Canceled)
+                    {
+                        return NotFound();
+                    }
+                    if (order != null)
+                    {
+                        await _orderActionsBL.ChangeOrderStatus(order, model.orderStatus);
+
+                        return Ok();
+
+                    }
+                    else return NotFound();
+                }
+                else return NotFound();
+            }
+            else return NotFound();
+        }
+
+        [HttpGet("GetNewOrders")]
+        public async Task<IActionResult> GetNewOrders()
+        {
+            var user = await _orderActionsBL.GetUser(UserId);
+
+            if (user != null)
+            {
+                if (user.Role == UserRole.Admin || user.Role == UserRole.Manager)
+                {
+                    return Ok(await _orderActionsBL.GetNewOrders());
+
+                }
+                else return NotFound();
+            }
+            else return NotFound();
+        }
     }
 }
 

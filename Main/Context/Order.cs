@@ -22,8 +22,23 @@ namespace WebShop.Main.Conext
 
         public DateTime OrderTime { get; set; }
 
+        public OrderStatus OrderStatus { get; set; }
+
         public ICollection<OrderList> OrderLists { get; set; }
     }
+
+    public enum OrderStatus
+    {
+        AwaitingConfirm,
+        AwaitingShipping,
+        Shipped,
+        Delivered,
+        Completed,
+        Declined,
+        Refunded,
+        Canceled,
+    }
+
 
     public class Info
     {
@@ -51,6 +66,7 @@ namespace WebShop.Main.Conext
 
         public string PhoneNumber { get; set; }
 
+        [JsonIgnore]
         public Order Order { get; set; }
     }
 }

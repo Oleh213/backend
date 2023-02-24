@@ -1,6 +1,8 @@
 ﻿
 using System;
+using System.Globalization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OData;
 using WebShop.Main.Conext;
 using WebShop.Main.Context;
 using WebShop.Main.DBContext;
@@ -62,12 +64,21 @@ namespace WebShop.Main.BusinessLogic
         {
             var id = Guid.NewGuid();
 
+            System.Globalization.CultureInfo customCulture = new System.Globalization.CultureInfo("en-US", true);
+            customCulture.DateTimeFormat.ShortDatePattern = "yyyy-MM-dd   h:mm:ss ";
+
+            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
+            System.Threading.Thread.CurrentThread.CurrentUICulture = customCulture;
+
+            DateTime newDate = System.Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd   h:mm:ss tt"));
+
             var newOrder = new Order()
             {
                 OrderId = id,
                 UserId = user.UserId,
                 TotalPrice = model.TotalPrice,
-                OrderTime = DateTime.Now,
+                OrderTime = newDate,
+                OrderStatus = OrderStatus.AwaitingConfirm,
                 Info = new Info
                 {
                     OrderId = id,
@@ -111,10 +122,35 @@ namespace WebShop.Main.BusinessLogic
 
             return "Ok";
         }
+
         public async Task<List<Order>> ShowOrders(Guid userId)
         {
             return await _context.orders.Where(id => id.UserId == userId).Include(x => x.OrderLists).OrderByDescending(x => x.OrderTime).ToListAsync();
         }
+
+        public async Task<Order> GetOrder(Guid orderId)
+        {
+            return await _context.orders.FirstOrDefaultAsync(x => x.OrderId == orderId);
+        }
+
+        public async Task<string> ChangeOrderStatus(Order order, OrderStatus orderStatus)
+        {
+            order.OrderStatus = orderStatus;
+
+            await _context.SaveChangesAsync();
+
+            return "Ok";
+        }
+
+        public async Task<List<Order>> GetNewOrders()
+        {
+            return await _context.orders.Where(x => x.OrderStatus != OrderStatus.Completed && x.OrderStatus != OrderStatus.Declined && x.OrderStatus != OrderStatus.Canceled)
+                .Include(x=> x.OrderLists)
+                .Include(x=> x.Info)
+                .OrderByDescending(x => x.OrderTime)
+                .ToListAsync();
+        }
+
     }
 }
 

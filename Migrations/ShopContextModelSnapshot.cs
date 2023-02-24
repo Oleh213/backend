@@ -153,6 +153,9 @@ namespace WebShop.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("OrderStatus")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("OrderTime")
                         .HasColumnType("datetime2");
 
