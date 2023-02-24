@@ -5802,11 +5802,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/oleh/Projects/WebShop/WebShop/WebShop.csproj",
+      "projectUniqueName": "/Users/oleh/Document/Project/Beckend.Net/WebShop.csproj",
       "projectName": "WebShop",
-      "projectPath": "/Users/oleh/Projects/WebShop/WebShop/WebShop.csproj",
+      "projectPath": "/Users/oleh/Document/Project/Beckend.Net/WebShop.csproj",
       "packagesPath": "/Users/oleh/.nuget/packages/",
-      "outputPath": "/Users/oleh/Projects/WebShop/WebShop/obj/",
+      "outputPath": "/Users/oleh/Document/Project/Beckend.Net/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/oleh/.nuget/NuGet/NuGet.Config"
@@ -5961,7 +5961,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.103/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.200/RuntimeIdentifierGraph.json"
       }
     }
   }
