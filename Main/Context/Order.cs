@@ -22,8 +22,6 @@ namespace WebShop.Main.Conext
 
         public DateTime OrderTime { get; set; }
 
-        public OrderStatus OrderStatus { get; set; }
-
         public ICollection<OrderList> OrderLists { get; set; }
     }
 
