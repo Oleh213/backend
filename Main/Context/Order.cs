@@ -20,6 +20,10 @@ namespace WebShop.Main.Conext
 
         public string? UsedPromocode { get; set; }
 
+        public DateTime OrderTime { get; set; }
+
+        public OrderStatus OrderStatus { get; set; }
+
         public ICollection<OrderList> OrderLists { get; set; }
     }
 

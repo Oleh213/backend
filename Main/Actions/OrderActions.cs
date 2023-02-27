@@ -37,15 +37,17 @@ namespace Shop.Main.Actions
         {
             var user =  await _orderActionsBL.GetUser(UserId);
 
+            var totalPrice = await _orderActionsBL.GetTotalPrice(user, model.Promocode);
+
             if (model.Card != null)
             {
                 var card = await _orderActionsBL.GetCartd(model.Card.CardNumber, model.Card.ExpiredDate, model.Card.Cvv);
 
                 if (card != null)
                 {
-                    if (card.Balance >= model.TotalPrice)
+                    if (card.Balance >= totalPrice)
                     {
-                        card.Balance -= model.TotalPrice;
+                        card.Balance -= totalPrice;
                     }
                     else
                     {
@@ -71,9 +73,9 @@ namespace Shop.Main.Actions
             }
             else
             {
-                if (user.AccountBalance >= model.TotalPrice)
+                if (user.AccountBalance >= totalPrice)
                 {
-                    user.AccountBalance -= model.TotalPrice;
+                    user.AccountBalance -= totalPrice;
                 }
                 else
                 {
@@ -99,7 +101,7 @@ namespace Shop.Main.Actions
                 return NotFound(resError);
             }
 
-            await _orderActionsBL.CreateNewOrder(products, user, model);
+            await _orderActionsBL.CreateNewOrder(products, user, model, totalPrice);
 
             var resOk = new Response<string>()
             {

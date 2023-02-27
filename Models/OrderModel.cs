@@ -5,7 +5,7 @@ namespace WebShop.Models
 	{
 		public Card? Card { get; set; } 
 
-		public int TotalPrice { get; set; }
+		public string? Promocode { get; set; }
 
 		public DeliveryOptionsModel DeliveryOptions { get; set; }
 

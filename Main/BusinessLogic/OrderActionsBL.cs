@@ -60,23 +60,17 @@ namespace WebShop.Main.BusinessLogic
             return false;
         }
 
-        public async Task<string> CreateNewOrder(List<Product> products, User user, OrderModel model)
+        public async Task<string> CreateNewOrder(List<Product> products, User user, OrderModel model, int totalPrice)
         {
             var id = Guid.NewGuid();
 
-            System.Globalization.CultureInfo customCulture = new System.Globalization.CultureInfo("en-US", true);
-            customCulture.DateTimeFormat.ShortDatePattern = "yyyy-MM-dd   h:mm:ss ";
-
-            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
-            System.Threading.Thread.CurrentThread.CurrentUICulture = customCulture;
-
-            DateTime newDate = System.Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd   h:mm:ss tt"));
+            DateTime newDate = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd h:mm:ss tt"));
 
             var newOrder = new Order()
             {
                 OrderId = id,
                 UserId = user.UserId,
-                TotalPrice = model.TotalPrice,
+                TotalPrice = totalPrice,
                 OrderTime = newDate,
                 OrderStatus = OrderStatus.AwaitingConfirm,
                 Info = new Info
@@ -149,6 +143,39 @@ namespace WebShop.Main.BusinessLogic
                 .Include(x=> x.Info)
                 .OrderByDescending(x => x.OrderTime)
                 .ToListAsync();
+        }
+
+        public async Task<int> GetTotalPrice(User user, string promocode)
+        {
+            var cart = await _context.cartItems.Where(x => x.UserId == user.UserId).ToListAsync();
+
+            if (cart!=null)
+            {
+                var promo = await _context.promocodes.FirstOrDefaultAsync(x=> x.Code == promocode);
+
+                int totalPrice = 0;
+                foreach(var item in cart)
+                {
+                    totalPrice += item.Product.Price;
+                }
+
+                if(promo!=null)
+                {
+                    if (promo.Discount > totalPrice)
+                    {
+                        return 0;
+                    }
+                    else
+                    {
+                        return totalPrice -= promo.Discount;
+                    }
+                }
+                else
+                {
+                    return totalPrice;
+                }
+            }
+            return 0;
         }
 
     }
