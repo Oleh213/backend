@@ -1,3 +1,31 @@
 ﻿<Properties StartupConfiguration="{4AF14A70-8F99-4864-8D9E-695048DD2856}|gdfg">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.Workbench ActiveDocument="Main/Context/Order.cs">
+    <Files>
+      <File FileName="Main/Actions/DiscountActions.cs" Line="1" Column="1" />
+      <File FileName="Main/Actions/ComentsActions.cs" Line="64" Column="36" />
+      <File FileName="Main/Actions/OrderActions.cs" Line="40" Column="36" />
+      <File FileName="Main/Context/Order.cs" Line="38" Column="18" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="WebShop" expanded="True">
+            <Node name="WebShop" expanded="True">
+              <Node name="Main" expanded="True">
+                <Node name="Actions" expanded="True" />
+                <Node name="Context" expanded="True" />
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.ItemProperties.WebShop PreferredExecutionTarget="/Applications/Google Chrome.app" />
 </Properties>
