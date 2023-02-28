@@ -382,6 +382,27 @@ namespace WebShop.Migrations
                     b.ToTable("deliveryOptions");
                 });
 
+            modelBuilder.Entity("WebShop.Main.Context.Logger", b =>
+                {
+                    b.Property<Guid>("LoggerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("LogTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("LoggerLevel")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("LoggerId");
+
+                    b.ToTable("loggers");
+                });
+
             modelBuilder.Entity("WebShop.Main.Context.OrderList", b =>
                 {
                     b.Property<Guid>("OrderListId")

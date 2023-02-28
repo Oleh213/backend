@@ -14,7 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.OData.UriParser;
-
+using WebShop.Main.Context;
 
 namespace Shop.Main.Actions
 {
@@ -23,40 +23,51 @@ namespace Shop.Main.Actions
     [Route("[controller]")] 
     public class LogInActions : ControllerBase  
     {
-        private ShopContext _context;
+        private readonly ILoggerBL _loggerBL;
 
         private ILogInActionsBL _logInActionsBL;
 
-        public LogInActions(ShopContext context, ILogInActionsBL logInActionsBL)
+        public LogInActions(ILogInActionsBL logInActionsBL, ILoggerBL loggerBL)
         {
-            _context = context;
-
             _logInActionsBL = logInActionsBL;
+            _loggerBL = loggerBL;
         }
 
         [HttpPost("LogIn")]
         public async Task<IActionResult> LogIn([FromBody] LoginModule model)
         {
-            var user = await _logInActionsBL.AuthenticateUser(model.Name, model.Password);
-
-            if (user != null)
+            try
             {
-                var token = _logInActionsBL.GenerateJWT(user);
+                var user = await _logInActionsBL.AuthenticateUser(model.Name, model.Password);
 
-                return Ok( new
+                if (user != null)
                 {
-                    access_token = token
-                });
+                    var token = _logInActionsBL.GenerateJWT(user);
+
+                    _loggerBL.AddLog(LoggerLevel.Info, $"User:'{user.UserId}' login to account");
+
+                    return Ok(new
+                    {
+                        access_token = token
+                    });
+                }
+                else
+                {
+                    var resEr = new Response<string>()
+                    {
+                        IsError = true,
+                        ErrorMessage = "401",
+                        Data = "Check your name or password!"
+                    };
+                    _loggerBL.AddLog(LoggerLevel.Warn, $"User:'{model.Name}' enter incorrect info");
+                    return Unauthorized(resEr);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var resEr = new Response<string>()
-                {
-                    IsError = true,
-                    ErrorMessage = "401",
-                    Data = "Check your name or password!"
-                };
-                return Unauthorized(resEr);
+                _loggerBL.AddLog(LoggerLevel.Error, ex.Message);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
         

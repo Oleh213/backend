@@ -12,7 +12,7 @@ namespace WebShop.Main.Interfaces
 
         Task<Product> GetProduct(Guid productId);
 
-        Task<string> AddComent(ComentsModel model, Guid userId);
+        Task<Guid> AddComent(ComentsModel model, Guid userId);
 
         Task<string> CountRating(Product product);
 

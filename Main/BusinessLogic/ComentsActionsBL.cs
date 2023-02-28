@@ -29,11 +29,12 @@ namespace WebShop.Main.BusinessLogic
             return await _context.products.FirstOrDefaultAsync(x => x.ProductId == productId);
         }
 
-        public async Task<string> AddComent(ComentsModel model, Guid userId)
+        public async Task<Guid> AddComent(ComentsModel model, Guid userId)
         {
+            var id = Guid.NewGuid();
             _context.coments.Add(new Coments
             {
-                ComentId = Guid.NewGuid(),
+                ComentId = id,
                 Body = model.Body,
                 ParentId = model.ParentId,
                 CreatedAt = DateTime.Now,
@@ -44,7 +45,7 @@ namespace WebShop.Main.BusinessLogic
 
             await _context.SaveChangesAsync();
 
-            return "Ok";
+            return id;
         }
 
         public async Task<string> CountRating(Product product)

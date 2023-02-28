@@ -4,7 +4,9 @@ using System.Security.Claims;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebShop.Main.BusinessLogic;
 using WebShop.Main.Conext;
+using WebShop.Main.Context;
 using WebShop.Main.DBContext;
 using WebShop.Main.Interfaces;
 using WebShop.Models;
@@ -15,13 +17,14 @@ namespace Shop.Main.Actions
     [Route("[controller]")]
     public class PromocodeActions : ControllerBase
     {
-        private ShopContext _context;
         private IPromocodeActionsBL _promocodeActionsBL;
 
-        public PromocodeActions(ShopContext context, IPromocodeActionsBL promocodeActionsBL)
+        private readonly ILoggerBL _loggerBL;
+
+        public PromocodeActions(IPromocodeActionsBL promocodeActionsBL, ILoggerBL loggerBL)
         {
-            _context = context;
             _promocodeActionsBL = promocodeActionsBL;
+            _loggerBL = loggerBL;
         }
 
         private Guid UserId => Guid.Parse(User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value);
@@ -52,16 +55,43 @@ namespace Shop.Main.Actions
         //}
 
         [HttpPost("UsePromocode")]
-        public async Task<int> UsePromocode([FromBody] PromocodeModel model)
+        public async Task<IActionResult> UsePromocode([FromBody] PromocodeModel model)
         {
-            var promo =  await _promocodeActionsBL.GetPromocode(model.Code);
-
-            if (promo != null)
+            try
             {
-                return promo.Discount;
+                var promo = await _promocodeActionsBL.GetPromocode(model.Code);
+
+                if (promo != null)
+                {
+                    var resOk = new Response<int>()
+                    {
+                        IsError = true,
+                        ErrorMessage = "",
+                        Data = promo.Discount,
+                    };
+
+                    _loggerBL.AddLog(LoggerLevel.Info, $"User:'{UserId}' used Promocode:'{promo.Code}'");
+                    return Ok(resOk);
+                }
+                else
+                {
+                    var resError = new Response<int>()
+                    {
+                        IsError = true,
+                        ErrorMessage = "Promocode don't found",
+                        Data = 0,
+                    };
+
+                    _loggerBL.AddLog(LoggerLevel.Warn, $"User:'{UserId}' wanted to use Promocode:'{promo.Code}'");
+                    return Ok(resError);
+                }
             }
-            else
-                return 0;
+            catch (Exception ex)
+            {
+                _loggerBL.AddLog(LoggerLevel.Error, ex.Message);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
     }
 }

@@ -6,6 +6,8 @@ using WebShop.Main.DBContext;
 using WebShop.Models;
 using Microsoft.AspNetCore.Authorization;
 using WebShop.Main.Interfaces;
+using WebShop.Main.BusinessLogic;
+using WebShop.Main.Context;
 
 namespace WebShop.Main.Actions
 {
@@ -13,15 +15,14 @@ namespace WebShop.Main.Actions
     [Route("MoneyToBalance")]
     public class MoneyOnBalanceActions : ControllerBase
     {
-        private ShopContext _context;
-
         private IMoneyOnBalanceActionsBL _moneyOnBalanceActionsBL;
 
-        public MoneyOnBalanceActions(ShopContext context, IMoneyOnBalanceActionsBL moneyOnBalanceActionsBL)
-        {
-            _context = context;
+        private readonly ILoggerBL _loggerBL;
 
+        public MoneyOnBalanceActions(IMoneyOnBalanceActionsBL moneyOnBalanceActionsBL, ILoggerBL loggerBL)
+        {
             _moneyOnBalanceActionsBL = moneyOnBalanceActionsBL;
+            _loggerBL = loggerBL;
         }
         private Guid UserId => Guid.Parse(User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value);
 
@@ -29,36 +30,54 @@ namespace WebShop.Main.Actions
         [HttpPost("AddMoney")]
         public async Task<IActionResult> AddMoney([FromBody] TopUpModel model)
         {
-            var card = await _moneyOnBalanceActionsBL.GetCartd(model.CardNumber);
-
-            if (card != null)
+            try
             {
-                if (card.CardNumber == model.CardNumber && card.Cvv == model.Cvv && card.ExpiredDate == model.ExpiredDate)
+                var card = await _moneyOnBalanceActionsBL.GetCartd(model.CardNumber);
+
+                if (card != null)
                 {
-                    if (card.Balance >= model.RequestedAmount)
+                    if (card.CardNumber == model.CardNumber && card.Cvv == model.Cvv && card.ExpiredDate == model.ExpiredDate)
                     {
-                        var user = await _moneyOnBalanceActionsBL.GetUser(UserId);
-
-                        await _moneyOnBalanceActionsBL.TopUpBalance(user,card,model.RequestedAmount);
-
-                        var resOk = new Response<string>()
+                        if (card.Balance >= model.RequestedAmount)
                         {
-                            IsError = false,
-                            ErrorMessage = "",
-                            Data = "Your balance successful top up"
-                        };
-                        return Ok(resOk);
+                            var user = await _moneyOnBalanceActionsBL.GetUser(UserId);
+
+                            await _moneyOnBalanceActionsBL.TopUpBalance(user, card, model.RequestedAmount);
+
+                            var resOk = new Response<string>()
+                            {
+                                IsError = false,
+                                ErrorMessage = "",
+                                Data = "Your balance successful top up"
+                            };
+
+                            _loggerBL.AddLog(LoggerLevel.Info, $"User:'{user.UserId}' top up account balance using card(CardNumber:'{card.CardNumber}', Amount:'{model.RequestedAmount}')");
+                            return Ok(resOk);
+                        }
+                        else
+                        {
+                            var resError2 = new Response<string>()
+                            {
+                                IsError = true,
+                                ErrorMessage = "No ammont",
+                                Data = "You don't have enough amount on your card!"
+                            };
+
+                            _loggerBL.AddLog(LoggerLevel.Warn, $"User:'{UserId}' wanted top up account balance using card(CardNumber:'{card.CardNumber}', Amount:'{model.RequestedAmount}', CardBalance:'{card.Balance}')");
+                            return NotFound(resError2);
+                        }
                     }
                     else
                     {
-                        var resError2 = new Response<string>()
+                        var resError1 = new Response<string>()
                         {
                             IsError = true,
-                            ErrorMessage = "No ammont",
-                            Data = "You don't have enough amount on your card!"
+                            ErrorMessage = "Card don't found",
+                            Data = "Card information is not correct"
                         };
 
-                        return NotFound(resError2);
+                        _loggerBL.AddLog(LoggerLevel.Warn, $"User:'{UserId}' enter incorrect card information(CardNumber:'{model.CardNumber}', Date:'{model.ExpiredDate}', CVV:'{model.Cvv}')");
+                        return NotFound(resError1);
                     }
                 }
                 else
@@ -67,42 +86,47 @@ namespace WebShop.Main.Actions
                     {
                         IsError = true,
                         ErrorMessage = "Card don't found",
-                        Data = "Card information is not correct"
+                        Data = "Card don't found"
                     };
+
+                    _loggerBL.AddLog(LoggerLevel.Warn, $"User:'{UserId}' enter incorrect card(CardNumber:'{model.CardNumber}', Date:'{model.ExpiredDate}', CVV:'{model.Cvv}')");
                     return NotFound(resError1);
                 }
-                    
             }
-            else
+            catch (Exception ex)
             {
-                var resError1 = new Response<string>()
-                {
-                    IsError = true,
-                    ErrorMessage = "Card don't found",
-                    Data = "Card don't found"
-                };
-                return NotFound(resError1);
+                _loggerBL.AddLog(LoggerLevel.Error, ex.Message);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
         [HttpGet("GetAccountBalance")]
         [Authorize]
-        public async  Task<IActionResult> GetAccountBalance()
+        public async Task<IActionResult> GetAccountBalance()
         {
-            var user = await _moneyOnBalanceActionsBL.GetUser(UserId);
+            try {
+                var user = await _moneyOnBalanceActionsBL.GetUser(UserId);
 
-            if (user != null)
-            {
-                var res = new Response<int>()
+                if (user != null)
                 {
-                    IsError = true,
-                    ErrorMessage = "Item in cart ",
-                    Data = user.AccountBalance,
-                };
-                return Ok(res);
+                    var res = new Response<int>()
+                    {
+                        IsError = false,
+                        ErrorMessage = "",
+                        Data = user.AccountBalance,
+                    };
+                    return Ok(res);
+                }
+                else
+                    return NotFound();
             }
+            catch (Exception ex)
+            {
+                _loggerBL.AddLog(LoggerLevel.Error, ex.Message);
 
-            else
-                return NotFound();
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
     }
 }

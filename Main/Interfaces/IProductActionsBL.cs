@@ -12,7 +12,7 @@ namespace WebShop.Main.Interfaces
 
         Task<bool> CheckCategory(Guid categoryId);
 
-        Task<string> AddProduct(ProductModel model);
+        Task<Guid> AddProduct(ProductModel model);
 
         Task<string> UpdateProduct(UpdateProductModel model, Product product);
 

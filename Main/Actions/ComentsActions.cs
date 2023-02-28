@@ -22,14 +22,14 @@ namespace WebShop.Main.Actions
     [Route("ComentsActions")]
     public class ComentsActions : ControllerBase
     {
-        private ShopContext _context;
-
         private IComentsActionsBL _comentsActionsBL;
 
-        public ComentsActions(ShopContext context, IComentsActionsBL comentsActionsBL)
+        private readonly ILoggerBL _loggerBL;
+
+        public ComentsActions(IComentsActionsBL comentsActionsBL, ILoggerBL loggerBL)
         {
-            _context = context;
             _comentsActionsBL = comentsActionsBL;
+            _loggerBL = loggerBL;
         }
 
         private Guid UserId => Guid.Parse(User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value);
@@ -38,52 +38,73 @@ namespace WebShop.Main.Actions
         [Authorize]
         public async Task<IActionResult> AddComent([FromBody] ComentsModel model)
         {
-            var user = await _comentsActionsBL.GetUser(UserId);
-
-            var product = await _comentsActionsBL.GetProduct(model.ProductId);
-
-            if (user != null)
+            try
             {
-                await _comentsActionsBL.AddComent(model, UserId);
+                var user = await _comentsActionsBL.GetUser(UserId);
 
-                await _comentsActionsBL.CountRating(product);
+                var product = await _comentsActionsBL.GetProduct(model.ProductId);
 
-                var ok = new Response<string>()
+                if (user != null)
                 {
-                    IsError = false,
-                    ErrorMessage = "",
-                    Data = "Coment was successfully added"
-                };
+                    var id = await _comentsActionsBL.AddComent(model, UserId);
 
-                return Ok(ok);
+                    await _comentsActionsBL.CountRating(product);
+
+                    var ok = new Response<string>()
+                    {
+                        IsError = false,
+                        ErrorMessage = "",
+                        Data = "Coment was successfully added"
+                    };
+
+                    _loggerBL.AddLog(LoggerLevel.Info, $"UserId:'{UserId}' added new ComentId:'{id}'");
+                    return Ok(ok);
+                }
+                else
+                {
+                    var resError = new Response<string>()
+                    {
+                        IsError = true,
+                        ErrorMessage = "",
+                        Data = "Please log in to add coment!"
+                    };
+                    _loggerBL.AddLog(LoggerLevel.Warn, $"UserId:'{UserId}' not login to write comment!");
+                    return NotFound(resError);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var resError = new Response<string>()
-                {
-                    IsError = true,
-                    ErrorMessage = "",
-                    Data = "Please log in to add coment!"
-                };
-                return NotFound(resError);
+                _loggerBL.AddLog(LoggerLevel.Error, ex.Message);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
 
         [HttpGet("GetComent")]
         public async Task<IActionResult> GetComent([FromQuery] Guid ProductId)
         {
-
-            var coments = await _comentsActionsBL.GetComents(ProductId);
-
-            if (coments != null)
+            try
             {
-                var comentsDTO = _comentsActionsBL.ComentsDTO(coments);
+                var coments = await _comentsActionsBL.GetComents(ProductId);
 
-                return Ok(comentsDTO);
+                if (coments != null)
+                {
+                    var comentsDTO = _comentsActionsBL.ComentsDTO(coments);
+
+                    _loggerBL.AddLog(LoggerLevel.Info, $"UserId:'{UserId}' get coment of ProductId:'{ProductId}'");
+                    return Ok(comentsDTO);
+                }
+                else
+                {
+                    _loggerBL.AddLog(LoggerLevel.Warn, $"UserId:'{UserId}' wanted get coments ProductId:'{ProductId}'(Coments don't found!)");
+                    return NotFound();
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return NotFound();
+                _loggerBL.AddLog(LoggerLevel.Error, ex.Message);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
 
@@ -91,18 +112,28 @@ namespace WebShop.Main.Actions
         [Authorize]
         public async Task<IActionResult> UpdateComent([FromBody] PatchModel model)
         {
-
-            var coment = await _comentsActionsBL.GetComent(model.ComentId);
-
-            if (coment != null)
+            try
             {
-                await _comentsActionsBL.ChangeComent(coment, model.Body);
+                var coment = await _comentsActionsBL.GetComent(model.ComentId);
 
-                return Ok();
+                if (coment != null)
+                {
+                    await _comentsActionsBL.ChangeComent(coment, model.Body);
+
+                    _loggerBL.AddLog(LoggerLevel.Info, $"UserId:'{UserId}' eddit coment of ComentId:'{model.ComentId}'");
+                    return Ok();
+                }
+                else
+                {
+                    _loggerBL.AddLog(LoggerLevel.Warn, $"UserId:'{UserId}' wanted eddit coment ComentId:'{model.ComentId}'(ComentId don't found!)");
+                    return NotFound();
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return NotFound();
+                _loggerBL.AddLog(LoggerLevel.Error, ex.Message);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
 
@@ -110,19 +141,30 @@ namespace WebShop.Main.Actions
         [Authorize]
         public async Task<IActionResult> DeleteComent([FromQuery] Guid ComentId)
         {
-            var coment = await _comentsActionsBL.GetComent(ComentId);
-
-            if (coment != null)
+            try
             {
-                var child = await _comentsActionsBL.GetChildComents(ComentId);
+                var coment = await _comentsActionsBL.GetComent(ComentId);
 
-                await _comentsActionsBL.RemoveComent(coment, child);
+                if (coment != null)
+                {
+                    var child = await _comentsActionsBL.GetChildComents(ComentId);
 
-                return Ok();
+                    await _comentsActionsBL.RemoveComent(coment, child);
+
+                    _loggerBL.AddLog(LoggerLevel.Info, $"UserId:'{UserId}' delet coment ComentId:'{ComentId}'");
+                    return Ok();
+                }
+                else
+                {
+                    _loggerBL.AddLog(LoggerLevel.Warn, $"UserId:'{UserId}' wanted delet coment ComentId:'{ComentId}'(ComentId don't found!)");
+                    return NotFound();
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return NotFound();
+                _loggerBL.AddLog(LoggerLevel.Error, ex.Message);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
     }

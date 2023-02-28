@@ -14,6 +14,7 @@ using System.Data.Entity;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using WebShop.Models;
+using WebShop.Main.Context;
 
 namespace Shop.Main.Actions
 {
@@ -21,14 +22,14 @@ namespace Shop.Main.Actions
     [Route("CategoryActions")]
     public class CategoryActions : ControllerBase
     {
-        private ShopContext _context;
-
         private ICategoryActionsBL _categoryActionsBL;
 
-        public CategoryActions(ShopContext context, ICategoryActionsBL categoryActionsBL)
+        private readonly ILoggerBL _loggerBL;
+
+        public CategoryActions(ICategoryActionsBL categoryActionsBL, ILoggerBL loggerBL)
         {
-            _context = context;
             _categoryActionsBL = categoryActionsBL;
+            _loggerBL = loggerBL;
         }
 
         private Guid UserId => Guid.Parse(User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value);
@@ -37,50 +38,74 @@ namespace Shop.Main.Actions
         [HttpPost("AddCategory")]
         public async Task<IActionResult> AddCategory([FromBody] AddCategoryModel model)
         {
-            var user = await _categoryActionsBL.GetUser(UserId);
-
-            if (user!=null)
+            try
             {
-                if (user.Role == UserRole.Admin)
-                {
-                    if(!await _categoryActionsBL.CheckCategory(model.CategoryName))
-                    {
-                        await _categoryActionsBL.AddCategory(model.CategoryName);
+                var user = await _categoryActionsBL.GetUser(UserId);
 
-                        var resOk = new Response<string>()
+                if (user != null)
+                {
+                    if (user.Role == UserRole.Admin)
+                    {
+                        if (!await _categoryActionsBL.CheckCategory(model.CategoryName))
                         {
-                            IsError = false,
-                            ErrorMessage = "",
-                            Data = "Category was successfully added!"
-                        };
-                        return Ok(resOk);
+                            await _categoryActionsBL.AddCategory(model.CategoryName);
+
+                            var resOk = new Response<string>()
+                            {
+                                IsError = false,
+                                ErrorMessage = "",
+                                Data = "Category was successfully added!"
+                            };
+
+                            _loggerBL.AddLog(LoggerLevel.Info, $"UserId:'{UserId}' added new Category:'{model.CategoryName}'");
+                            return Ok(resOk);
+                        }
+                        else
+                        {
+                            var resError = new Response<string>()
+                            {
+                                IsError = true,
+                                ErrorMessage = "",
+                                Data = "Enter another name of category!"
+                            };
+
+                            _loggerBL.AddLog(LoggerLevel.Warn, $"UserId:'{UserId}' wanted add new Category:'{model.CategoryName}'(Category name already exists)");
+                            return NotFound(resError);
+                        }
                     }
                     else
                     {
-                        var resError = new Response<string>()
-                        {
-                            IsError = true,
-                            ErrorMessage = "",
-                            Data = "Enter another name of category!"
-                        };
-                        return NotFound(resError);
+                        _loggerBL.AddLog(LoggerLevel.Warn, $"UserId:'{UserId}' wanted add new Category:'{model.CategoryName}'(User not Admin!)");
+                        return Unauthorized();
                     }
-                    
                 }
                 else
                     return Unauthorized();
             }
-            else
-                return Unauthorized();
+            catch (Exception ex)
+            {
+                _loggerBL.AddLog(LoggerLevel.Error, ex.Message);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
 
         [HttpGet("GetAllCategories")]
         public IActionResult GetAllCategories()
         {
-            var categoriesDTO = _categoryActionsBL.CategoriesDTO();
+            try
+            {
+                var categoriesDTO = _categoryActionsBL.CategoriesDTO();
 
-            return Ok(categoriesDTO);
+                return Ok(categoriesDTO);
+            }
+            catch (Exception ex)
+            {
+                _loggerBL.AddLog(LoggerLevel.Error, ex.Message);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
     }
 }

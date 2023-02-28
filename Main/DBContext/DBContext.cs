@@ -38,6 +38,8 @@ namespace WebShop.Main.DBContext
 
         public DbSet<Coments> coments { get; set; }
 
+        public DbSet<Logger> loggers { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<CartItems>()
@@ -94,7 +96,6 @@ namespace WebShop.Main.DBContext
                 .WithMany(x => x.Coments)
                 .HasForeignKey(p => p.UserId);
 
-
             modelBuilder.Entity<User>().HasKey(s => new { s.UserId });
 
             modelBuilder.Entity<Order>().HasKey(s => new { s.OrderId });
@@ -118,6 +119,9 @@ namespace WebShop.Main.DBContext
             modelBuilder.Entity<ProductImages>().HasKey(s => new { s.ImageId });
 
             modelBuilder.Entity<Coments>().HasKey(s => new { s.ComentId });
+
+            modelBuilder.Entity<Logger>().HasKey(s => new { s.LoggerId });
+
         }
     }
 }

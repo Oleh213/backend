@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using WebShop.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using WebShop.Main.Context;
 
 namespace WebShop.Main.Actions
 {
@@ -15,13 +16,14 @@ namespace WebShop.Main.Actions
     [Route("[controller]")]
     public class DiscountActions : ControllerBase
     {
-        private ShopContext _context;
         private IDiscountActionsBL _discountActionsBL;
 
-        public DiscountActions(ShopContext context, IDiscountActionsBL discountActionsBL)
+        private readonly ILoggerBL _loggerBL;
+
+        public DiscountActions(IDiscountActionsBL discountActionsBL, ILoggerBL loggerBL)
         {
-            _context = context;
             _discountActionsBL = discountActionsBL;
+            _loggerBL = loggerBL;
         }
 
         private Guid UserId => Guid.Parse(User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value);
@@ -30,94 +32,126 @@ namespace WebShop.Main.Actions
         [Authorize]
         public async Task<IActionResult> AddDiscount([FromBody] AddProductDiscountModel model)
         {
-            var user = await _discountActionsBL.GetUser(UserId);
-
-            if (user != null)
+            try
             {
-                if (user.Role == UserRole.Admin)
+                var user = await _discountActionsBL.GetUser(UserId);
+
+                if (user != null)
                 {
-                    var product = await _discountActionsBL.GetProduct(model.ProductId);
-
-                    if (product != null)
+                    if (user.Role == UserRole.Admin)
                     {
-                        if(await _discountActionsBL.UsePromocode(product, model.DiscountType, model.Discount))
-                        {
-                            var resOk = new Response<string>()
-                            {
-                                IsError = false,
-                                ErrorMessage = "",
-                                Data = "Discount successfully added!"
-                            };
+                        var product = await _discountActionsBL.GetProduct(model.ProductId);
 
-                            return Ok(resOk);
+                        if (product != null)
+                        {
+                            if (await _discountActionsBL.UsePromocode(product, model.DiscountType, model.Discount))
+                            {
+                                var resOk = new Response<string>()
+                                {
+                                    IsError = false,
+                                    ErrorMessage = "",
+                                    Data = "Discount successfully added!"
+                                };
+
+                                _loggerBL.AddLog(LoggerLevel.Info, $"UserId:'{UserId}' added discount to ProductId:'{model.ProductId}'(Discount: {model.Discount} DiscountType: {model.DiscountType})");
+                                return Ok(resOk);
+                            }
+                            else
+                            {
+                                _loggerBL.AddLog(LoggerLevel.Warn, $"UserId:'{UserId}' want add discount to ProductId:'{model.ProductId}'(Discount: {model.Discount} DiscountType: {model.DiscountType})");
+                                return NotFound();
+                            }
                         }
                         else
-                        {
                             return NotFound();
-                        }
                     }
                     else
-                        return NotFound();
+                    {
+                        var resEr = new Response<string>()
+                        {
+                            IsError = true,
+                            ErrorMessage = "401",
+                            Data = $"* Error *, You can't do it!"
+                        };
+
+                        _loggerBL.AddLog(LoggerLevel.Warn, $"UserId:'{UserId}' want add discount to ProductId:'{model.ProductId}'(Permission denied!)");
+                        return Unauthorized(resEr);
+                    }
                 }
                 else
-                {
-                    var resEr = new Response<string>()
-                    {
-                        IsError = true,
-                        ErrorMessage = "401",
-                        Data = $"* Error *, You can't do it!"
-                    };
-                    return Unauthorized(resEr);
-                }
+                    return NotFound();
             }
-            else
-                return NotFound();
+            catch (Exception ex)
+            {
+                _loggerBL.AddLog(LoggerLevel.Error, ex.Message);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
         [HttpPost("ClearDiscount")]
         [Authorize]
         public async Task<IActionResult> ClearDiscount([FromBody] ClearDiscountProduct model)
         {
-            var user =  await _discountActionsBL.GetUser(UserId);
-
-            if (user != null)
+            try
             {
-                if (user.Role == UserRole.Admin)
+                var user = await _discountActionsBL.GetUser(UserId);
+
+                if (user != null)
                 {
-                    var product = await _discountActionsBL.GetProduct(model.ProductId);
-
-                    if (product != null)
+                    if (user.Role == UserRole.Admin)
                     {
-                        if (product.Discount != 0)
-                        {
-                            await _discountActionsBL.ClearDiscount(product);
+                        var product = await _discountActionsBL.GetProduct(model.ProductId);
 
-                            var resOk = new Response<string>()
+                        if (product != null)
+                        {
+                            if (product.Discount != 0)
                             {
-                                IsError = false,
-                                ErrorMessage = "",
-                                Data = "Discount successfully cleaned!"
-                            };
-                            return Ok(resOk);
+                                await _discountActionsBL.ClearDiscount(product);
+
+                                var resOk = new Response<string>()
+                                {
+                                    IsError = false,
+                                    ErrorMessage = "",
+                                    Data = "Discount successfully cleaned!"
+                                };
+
+                                _loggerBL.AddLog(LoggerLevel.Info, $"UserId:'{UserId}' clean discount to ProductId:'{model.ProductId}'");
+                                return Ok(resOk);
+                            }
+                            else
+                            {
+                                _loggerBL.AddLog(LoggerLevel.Warn, $"UserId:'{UserId}' wanted clean discount to ProductId:'{model.ProductId}'(Product discount != 0)");
+                                return NotFound();
+                            }
                         }
                         else
+                        {
+                            _loggerBL.AddLog(LoggerLevel.Warn, $"UserId:'{UserId}' wanted clean discount to ProductId:'{model.ProductId}'(ProductId:'{model.ProductId}' don't found)");
                             return NotFound();
+                        }
                     }
                     else
-                        return NotFound();
+                    {
+                        var resEr = new Response<string>()
+                        {
+                            IsError = true,
+                            ErrorMessage = "401",
+                            Data = $"* Error *, You can't do it!"
+                        };
+
+                        _loggerBL.AddLog(LoggerLevel.Warn, $"UserId:'{UserId}' wanted clean discount to ProductId:'{model.ProductId}'(Permission denied)");
+                        return Unauthorized(resEr);
+                    }
                 }
                 else
-                {
-                    var resEr = new Response<string>()
-                    {
-                        IsError = true,
-                        ErrorMessage = "401",
-                        Data = $"* Error *, You can't do it!"
-                    };
-                    return Unauthorized(resEr);
-                }
+                    return NotFound();
             }
-            else
-                return NotFound();
+            catch (Exception ex)
+            {
+                _loggerBL.AddLog(LoggerLevel.Error, ex.Message);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
     }
 }

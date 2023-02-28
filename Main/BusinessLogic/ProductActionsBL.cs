@@ -41,14 +41,15 @@ namespace WebShop.Main.BusinessLogic
             return await _context.categories.AnyAsync(x => x.CategoryId == categoryId);
         }
 
-        public async Task<string> AddProduct(ProductModel model)
+        public async Task<Guid> AddProduct(ProductModel model)
         {
+            Guid id = Guid.NewGuid();
             _context.products.Add(new Product()
             {
                 Name = model.Name,
                 Available = model.Available,
                 Price = model.Price,
-                ProductId = Guid.NewGuid(),
+                ProductId = id,
                 Description = model.Description,
                 CategoryId = model.CategoryId,
                 Img = model.Img,
@@ -56,7 +57,7 @@ namespace WebShop.Main.BusinessLogic
 
             await _context.SaveChangesAsync();
 
-            return "Ok";
+            return id;
         }
 
         public async Task<string> UpdateProduct(UpdateProductModel model, Product product)

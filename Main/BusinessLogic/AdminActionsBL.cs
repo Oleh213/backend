@@ -18,13 +18,21 @@ namespace Shop.Main.BusinessLogic
 
         public async Task<string> AddAdmin(Guid _userId)
         {
-            var user = await _context.users.FirstOrDefaultAsync(x => x.UserId == _userId);
+            try
+            {
+                var user = await _context.users.FirstOrDefaultAsync(x => x.UserId == _userId);
 
-            user.Role = UserRole.Admin;
+                user.Role = UserRole.Admin;
 
-            _context.SaveChanges();
+                _context.SaveChanges();
 
-            return user.Name;
+                return user.Name;
+            } catch (Exception ex)
+            {
+                // TODO: add logs
+                throw ex;
+            }
+    
         }
     }
 }

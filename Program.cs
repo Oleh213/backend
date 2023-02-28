@@ -80,6 +80,8 @@ builder.Services.AddScoped<IProductActionsBL, ProductActionsBL>();
 builder.Services.AddScoped<IPromocodeActionsBL, PromocodeActionsBL>();
 builder.Services.AddScoped<IRegistActionsBL, RegistActionsBL>();
 builder.Services.AddScoped<IUserActionsBL, UserActionsBL>();
+builder.Services.AddScoped<ILoggerBL, LoggerBL>();
+
 
 
 

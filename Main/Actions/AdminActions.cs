@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Shop.Main.BusinessLogic;
 using WebShop.Main.BusinessLogic;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace Shop.Main.Actions
 {
@@ -15,23 +16,37 @@ namespace Shop.Main.Actions
     [Route("AdminActions")]
     public class AddAdminActions : ControllerBase
     {
-        private ShopContext _context;
 
-        private IAdminActionsBL _addAdminActionsBL;
+        private readonly IAdminActionsBL _addAdminActionsBL;
 
-        public AddAdminActions(ShopContext context, IAdminActionsBL addAdminActionsBL)
+        private readonly ILoggerBL _loggerBL; 
+
+        public AddAdminActions(IAdminActionsBL addAdminActionsBL, ILoggerBL loggerBL)
         {
-            _context = context;
             _addAdminActionsBL = addAdminActionsBL;
+            _loggerBL = loggerBL;
         }
+
+        private Guid UserId => Guid.Parse(User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value);
+
 
         [HttpPut("AddAdmin")]
         [Authorize]
         public async Task<IActionResult> AddAdmin(Guid _userId)
         {
-          var name = await _addAdminActionsBL.AddAdmin(_userId);
+            try
+            {
+                var name = await _addAdminActionsBL.AddAdmin(_userId);
 
-          return Ok($"User name is {name}");
+                _loggerBL.AddLog(WebShop.Main.Context.LoggerLevel.Info, $"{_userId}, was added to admins team by {UserId}");
+                return Ok($"User name is {name}");
+            }
+            catch (Exception ex)
+            {
+                _loggerBL.AddLog(WebShop.Main.Context.LoggerLevel.Error, ex.Message);
+            
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
     }
 }
