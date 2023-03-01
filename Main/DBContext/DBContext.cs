@@ -40,6 +40,8 @@ namespace WebShop.Main.DBContext
 
         public DbSet<Logger> loggers { get; set; }
 
+        public DbSet<Message> messages { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<CartItems>()
@@ -96,6 +98,22 @@ namespace WebShop.Main.DBContext
                 .WithMany(x => x.Coments)
                 .HasForeignKey(p => p.UserId);
 
+            modelBuilder.Entity<Coments>()
+                .HasOne(x => x.Product)
+                .WithMany(x => x.Coments)
+                .HasForeignKey(p => p.ProductId);
+
+            modelBuilder.Entity<Message>()
+                .HasOne(x => x.User)
+                .WithMany(x => x.Messages)
+                .HasForeignKey(p => p.UserId);
+
+            modelBuilder.Entity<Message>()
+                .HasOne(x => x.Product)
+                .WithMany(x => x.Messages)
+                .HasForeignKey(p => p.ProductId);
+
+
             modelBuilder.Entity<User>().HasKey(s => new { s.UserId });
 
             modelBuilder.Entity<Order>().HasKey(s => new { s.OrderId });
@@ -121,6 +139,8 @@ namespace WebShop.Main.DBContext
             modelBuilder.Entity<Coments>().HasKey(s => new { s.ComentId });
 
             modelBuilder.Entity<Logger>().HasKey(s => new { s.LoggerId });
+
+            modelBuilder.Entity<Message>().HasKey(s => new { s.MessageId });
 
         }
     }

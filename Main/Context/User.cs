@@ -29,11 +29,13 @@ namespace WebShop.Main.Conext
 
         public int AccountBalance  { get; set; }
 
-        public ICollection<DeliveryOptions> DeliveryOptions { get; set; }
+        public ICollection<DeliveryOptions>? DeliveryOptions { get; set; }
 
-        public ICollection<CartItems> CartItems { get; set; }
+        public ICollection<CartItems>? CartItems { get; set; }
 
-        public ICollection<Coments> Coments { get; set; }
+        public ICollection<Coments>? Coments { get; set; }
+
+        public ICollection<Message>? Messages { get; set; }
 
     }
 

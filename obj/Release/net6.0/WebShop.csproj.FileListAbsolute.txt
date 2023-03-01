@@ -304,3 +304,14 @@
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/WebShop.pdb
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/WebShop.genruntimeconfig.cache
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/ref/WebShop.dll
+/Users/oleh/Document/Project/Beckend.Net/bin/Release/net6.0/Microsoft.AspNet.SignalR.Core.dll
+/Users/oleh/Document/Project/Beckend.Net/bin/Release/net6.0/Microsoft.AspNet.SignalR.SystemWeb.dll
+/Users/oleh/Document/Project/Beckend.Net/bin/Release/net6.0/Microsoft.AspNetCore.Connections.Abstractions.dll
+/Users/oleh/Document/Project/Beckend.Net/bin/Release/net6.0/Microsoft.AspNetCore.SignalR.Common.dll
+/Users/oleh/Document/Project/Beckend.Net/bin/Release/net6.0/Microsoft.Extensions.Features.dll
+/Users/oleh/Document/Project/Beckend.Net/bin/Release/net6.0/Microsoft.Owin.dll
+/Users/oleh/Document/Project/Beckend.Net/bin/Release/net6.0/Microsoft.Owin.Host.SystemWeb.dll
+/Users/oleh/Document/Project/Beckend.Net/bin/Release/net6.0/Microsoft.Owin.Security.dll
+/Users/oleh/Document/Project/Beckend.Net/bin/Release/net6.0/Newtonsoft.Json.dll
+/Users/oleh/Document/Project/Beckend.Net/bin/Release/net6.0/Owin.dll
+/Users/oleh/Document/Project/Beckend.Net/bin/Release/net6.0/System.IO.Pipelines.dll

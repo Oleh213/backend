@@ -40,6 +40,10 @@
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.26.1" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="7.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.1.0" />
+    <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.4.3" />
+    <PackageReference Include="Microsoft.AspNet.SignalR" Version="2.4.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -70,9 +74,11 @@
     <None Remove="Microsoft.IdentityModel.Tokens" />
     <None Remove="BCrypt.Net-Next" />
     <None Remove="Main\BusinessLogic\" />
+    <None Remove="Main\ChatHub\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Main\DTO\" />
     <Folder Include="Main\BusinessLogic\" />
+    <Folder Include="Main\ChatHub\" />
   </ItemGroup>
 </Project>

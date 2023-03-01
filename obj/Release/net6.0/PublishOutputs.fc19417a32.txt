@@ -25,8 +25,12 @@
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/EntityFramework.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/LogicBuilder.Expressions.Utils.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/LogicBuilder.Structures.dll
+/Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.AspNet.SignalR.Core.dll
+/Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.AspNet.SignalR.SystemWeb.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+/Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.AspNetCore.Connections.Abstractions.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.AspNetCore.OData.dll
+/Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.AspNetCore.SignalR.Common.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.Bcl.AsyncInterfaces.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.Data.SqlClient.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.Data.Sqlite.dll
@@ -45,6 +49,7 @@
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.Extensions.DependencyInjection.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.Extensions.DependencyInjection.Abstractions.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.Extensions.DependencyModel.dll
+/Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.Extensions.Features.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.Extensions.FileProviders.Abstractions.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.Extensions.FileProviders.Physical.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.Extensions.FileSystemGlobbing.dll
@@ -64,10 +69,15 @@
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.OData.Edm.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.OData.ModelBuilder.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.OpenApi.dll
+/Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.Owin.dll
+/Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.Owin.Host.SystemWeb.dll
+/Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.Owin.Security.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.Spatial.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.SqlServer.Server.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Microsoft.Win32.SystemEvents.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Mono.Reflection.dll
+/Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Newtonsoft.Json.dll
+/Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/Owin.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/SQLitePCLRaw.batteries_v2.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/SQLitePCLRaw.core.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/SQLitePCLRaw.provider.e_sqlite3.dll
@@ -79,6 +89,7 @@
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/System.Data.SqlClient.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/System.Drawing.Common.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/System.IdentityModel.Tokens.Jwt.dll
+/Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/System.IO.Pipelines.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/System.Linq.Dynamic.Core.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/System.Memory.Data.dll
 /Users/oleh/Document/Project/Beckend.Net/obj/Release/net6.0/PubTmp/Out/System.Runtime.Caching.dll

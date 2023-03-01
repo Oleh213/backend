@@ -37,5 +37,10 @@ namespace WebShop.Main.Conext
         [JsonIgnore]
         public ICollection<ProductImages>? Images { get; set; }
 
+        [JsonIgnore]
+        public ICollection<Message>? Messages { get; set; }
+
+        [JsonIgnore]
+        public ICollection<Coments>? Coments { get; set; }
     }
 }

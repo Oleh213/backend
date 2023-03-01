@@ -343,6 +343,8 @@ namespace WebShop.Migrations
 
                     b.HasKey("ComentId");
 
+                    b.HasIndex("ProductId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("coments");
@@ -401,6 +403,38 @@ namespace WebShop.Migrations
                     b.HasKey("LoggerId");
 
                     b.ToTable("loggers");
+                });
+
+            modelBuilder.Entity("WebShop.Main.Context.Message", b =>
+                {
+                    b.Property<Guid>("MessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("MessageText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("MessageId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("messages");
                 });
 
             modelBuilder.Entity("WebShop.Main.Context.OrderList", b =>
@@ -526,11 +560,19 @@ namespace WebShop.Migrations
 
             modelBuilder.Entity("WebShop.Main.Context.Coments", b =>
                 {
+                    b.HasOne("WebShop.Main.Conext.Product", "Product")
+                        .WithMany("Coments")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("WebShop.Main.Conext.User", "User")
                         .WithMany("Coments")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Product");
 
                     b.Navigation("User");
                 });
@@ -542,6 +584,25 @@ namespace WebShop.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WebShop.Main.Context.Message", b =>
+                {
+                    b.HasOne("WebShop.Main.Conext.Product", "Product")
+                        .WithMany("Messages")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebShop.Main.Conext.User", "User")
+                        .WithMany("Messages")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
 
                     b.Navigation("User");
                 });
@@ -581,6 +642,10 @@ namespace WebShop.Migrations
             modelBuilder.Entity("WebShop.Main.Conext.Product", b =>
                 {
                     b.Navigation("CartItems");
+
+                    b.Navigation("Coments");
+
+                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("WebShop.Main.Conext.User", b =>
@@ -590,6 +655,8 @@ namespace WebShop.Migrations
                     b.Navigation("Coments");
 
                     b.Navigation("DeliveryOptions");
+
+                    b.Navigation("Messages");
                 });
 #pragma warning restore 612, 618
         }

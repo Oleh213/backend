@@ -59,7 +59,7 @@ namespace Shop.Main.Actions
                         ErrorMessage = "401",
                         Data = "Check your name or password!"
                     };
-                    _loggerBL.AddLog(LoggerLevel.Warn, $"User:'{model.Name}' enter incorrect info");
+                    _loggerBL.AddLog(LoggerLevel.Warn, $"User:'{model.Name}' enter incorrect information when tried login");
                     return Unauthorized(resEr);
                 }
             }
