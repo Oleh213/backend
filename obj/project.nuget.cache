@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "w67fdjUgg+UBsL9Rlr78QoVbh4JD5ru/0wFHmxnqzJg2+vvQpUDLnlt1BOTEwv7qrgg8HLB0nDqdt5eExWJUIw==",
+  "dgSpecHash": "DvtSQ4mjguzXpSCCqOuhlnXz43mh3811gjXR4ThZ/1TTp0/SA6DVU3FbkGnS52+Y7Um7UJspCcWBAWj5Rc9+Qg==",
   "success": true,
-  "projectFilePath": "/Users/oleh/Document/Project/Beckend.Net/WebShop.csproj",
+  "projectFilePath": "/Users/oleh/Document/Project/shop-backend/WebShop.csproj",
   "expectedPackageFiles": [
     "/Users/oleh/.nuget/packages/autofac/6.5.0/autofac.6.5.0.nupkg.sha512",
     "/Users/oleh/.nuget/packages/automapper/12.0.0/automapper.12.0.0.nupkg.sha512",

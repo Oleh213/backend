@@ -91,12 +91,12 @@ namespace WebShop.Main.Actions
                 {
                     var comentsDTO = _comentsActionsBL.ComentsDTO(coments);
 
-                    _loggerBL.AddLog(LoggerLevel.Info, $"UserId:'{UserId}' get coment of ProductId:'{ProductId}'");
+                    //_loggerBL.AddLog(LoggerLevel.Info, $"UserId:'{UserId}' get coment of ProductId:'{ProductId}'");
                     return Ok(comentsDTO);
                 }
                 else
                 {
-                    _loggerBL.AddLog(LoggerLevel.Warn, $"UserId:'{UserId}' wanted get coments ProductId:'{ProductId}'(Coments don't found!)");
+                    //_loggerBL.AddLog(LoggerLevel.Warn, $"UserId:'{UserId}' wanted get coments ProductId:'{ProductId}'(Coments don't found!)");
                     return NotFound();
                 }
             }

@@ -1,15 +1,17 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+
 namespace WebShop.Models
 {
 	public class OrderModel
 	{
-		public Card? Card { get; set; } 
+		public Card Card { get; set; }
 
-		public string? Promocode { get; set; }
+        public string Promocode { get; set; }
 
 		public DeliveryOptionsModel DeliveryOptions { get; set; }
 
-		public ContactInfo contactInfo { get; set; }
+		public ContactInfo ContactInfo { get; set; }
 	}
 
 	public class Card
@@ -20,6 +22,7 @@ namespace WebShop.Models
 
         public string Cvv { get; set; }
     }
+
 	public class ContactInfo
 	{
 		public string Name { get; set; }

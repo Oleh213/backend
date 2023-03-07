@@ -11,7 +11,7 @@ using WebShop.Main.BusinessLogic;
 using Shop.Main.BusinessLogic;
 using WebShop.Controllers;
 using WebShop.Main.Interfaces;
-using WebShop.Main.ChatHubs;
+using WebShop.Main.Hubs;
 using Autofac.Core;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -121,6 +121,7 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
     endpoints.MapHub<ChatHub>("/chat");
+    endpoints.MapHub<OrderHub>("/order");
 
 });
 

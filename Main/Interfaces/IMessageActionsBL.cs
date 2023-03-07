@@ -9,7 +9,7 @@ namespace WebShop.Main.Interfaces
     {
         Task<User> GetUser(Guid userId);
 
-        Task <string> AddMessage(Guid UserId, string Message, Guid ProductId, string Name);
+        Task <string> AddMessage(Guid UserId, string Message, Guid ProductId);
 
         Task<List<Message>> GetMessages(Guid ProductId);
 

@@ -1,11 +1,13 @@
 ﻿
 using System;
 using System.Globalization;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OData;
 using WebShop.Main.Conext;
 using WebShop.Main.Context;
 using WebShop.Main.DBContext;
+using WebShop.Main.Hubs;
 using WebShop.Main.Interfaces;
 using WebShop.Models;
 
@@ -15,9 +17,13 @@ namespace WebShop.Main.BusinessLogic
     {
         private ShopContext _context;
 
-        public OrderActionsBL(ShopContext context)
+        private readonly IHubContext<OrderHub> _hubContext;
+
+
+        public OrderActionsBL(ShopContext context, IHubContext<OrderHub> hubContext)
         {
             _context = context;
+            _hubContext = hubContext;
         }
 
         public async Task<User> GetUser(Guid userId)
@@ -27,6 +33,12 @@ namespace WebShop.Main.BusinessLogic
                 .Include(u => u.CartItems)
                 .ThenInclude(ci => ci.Product)
                 .FirstOrDefaultAsync(); 
+        }
+
+        public async Task<List<Product>> GetUserProducts(User user)
+        {
+           
+            return user.CartItems.Select(x => x.Product).ToList();
         }
 
         public async Task<Cards> GetCartd(string cardNumber, string expiredDate, string cvv)
@@ -60,7 +72,39 @@ namespace WebShop.Main.BusinessLogic
             return false;
         }
 
-        public async Task<string> CreateNewOrder(List<Product> products, User user, OrderModel model, int totalPrice)
+        public async Task<bool> ChangeOrderInformation(Guid orderId, ChangeOrderInformationModel model)
+        {
+            var order = await _context.orders.
+                Where(x => x.OrderId == orderId)
+                .Include(x=>x.Info).
+                FirstOrDefaultAsync();
+
+            if (order != null)
+            {
+                order.Info.Name = model.Name;
+                order.Info.Address = model.Address;
+                order.Info.Address2 = model.Address2;
+                order.Info.City = model.City;
+                order.Info.Country = model.Country;
+                order.Info.Email = model.Email;
+                order.Info.LastName = model.LastName;
+                order.Info.PhoneNumber = model.PhoneNumber;
+                order.Info.Region = model.Region;
+                order.Info.ZipCode = model.ZipCode;
+
+                await _context.SaveChangesAsync();
+
+                await _hubContext.Clients.All.SendAsync("MakeOrder", order);
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public async Task<Order> CreateNewOrder(List<Product> products, User user, OrderModel model, int totalPrice)
         {
             var id = Guid.NewGuid();
 
@@ -82,10 +126,10 @@ namespace WebShop.Main.BusinessLogic
                     Region = model.DeliveryOptions.Region,
                     ZipCode = model.DeliveryOptions.ZipCode,
                     Address2 = model.DeliveryOptions.Address2,
-                    Name = model.contactInfo.Name,
-                    LastName = model.contactInfo.LastName,
-                    Email = model.contactInfo.Email,
-                    PhoneNumber = model.contactInfo.PhoneNumber,
+                    Name = model.ContactInfo.Name,
+                    LastName = model.ContactInfo.LastName,
+                    Email = model.ContactInfo.Email,
+                    PhoneNumber = model.ContactInfo.PhoneNumber,
                 }
             };
             _context.orders.Add(newOrder);
@@ -114,24 +158,34 @@ namespace WebShop.Main.BusinessLogic
             }
             await _context.SaveChangesAsync();
 
-            return "Ok";
+            await _hubContext.Clients.All.SendAsync("MakeOrder", newOrder);
+
+            return newOrder;
         }
 
         public async Task<List<Order>> ShowOrders(Guid userId)
         {
-            return await _context.orders.Where(id => id.UserId == userId).Include(x => x.OrderLists).OrderByDescending(x => x.OrderTime).ToListAsync();
+            return await _context.orders.Where(id => id.UserId == userId).Include(x => x.OrderLists).Include(x => x.Info).OrderByDescending(x => x.OrderTime).ToListAsync();
         }
 
         public async Task<Order> GetOrder(Guid orderId)
         {
-            return await _context.orders.FirstOrDefaultAsync(x => x.OrderId == orderId);
+            return await _context.orders.Where(x => x.OrderId == orderId).Include(x=> x.Info).FirstOrDefaultAsync();
         }
 
         public async Task<string> ChangeOrderStatus(Order order, OrderStatus orderStatus)
         {
             order.OrderStatus = orderStatus;
 
+            var orderDTO = _context.orders
+                .Where(x => x.OrderId == order.OrderId)
+                .Include(x => x.OrderLists)
+                .Include(x => x.Info)
+                .FirstOrDefault();
+
             await _context.SaveChangesAsync();
+
+            await _hubContext.Clients.All.SendAsync("MakeOrder", orderDTO);
 
             return "Ok";
         }

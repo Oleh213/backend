@@ -43,7 +43,7 @@ namespace WebShop.Main.BusinessLogic
             user.Name = model.Name;
             user.Email = model.Email;
             user.LastName = model.LastName;
-            user.PhoneNumber = model.PhoneNumber;
+            user.PhoneNumber = model.PhoneNumber.ToString();
             user.Birthday = model.Birthday;
 
             await _context.SaveChangesAsync();

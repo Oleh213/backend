@@ -141,7 +141,6 @@ namespace WebShop.Main.DBContext
             modelBuilder.Entity<Logger>().HasKey(s => new { s.LoggerId });
 
             modelBuilder.Entity<Message>().HasKey(s => new { s.MessageId });
-
         }
     }
 }

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.SignalR;                                         
 using WebShop.Main.Context;
 
-namespace WebShop.Main.ChatHubs
+namespace WebShop.Main.Hubs
 {
     public class ChatHub:Hub                                              
     {
@@ -12,4 +12,3 @@ namespace WebShop.Main.ChatHubs
         }
     }
 }
-

@@ -6482,11 +6482,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/oleh/Document/Project/Beckend.Net/WebShop.csproj",
+      "projectUniqueName": "/Users/oleh/Document/Project/shop-backend/WebShop.csproj",
       "projectName": "WebShop",
-      "projectPath": "/Users/oleh/Document/Project/Beckend.Net/WebShop.csproj",
+      "projectPath": "/Users/oleh/Document/Project/shop-backend/WebShop.csproj",
       "packagesPath": "/Users/oleh/.nuget/packages/",
-      "outputPath": "/Users/oleh/Document/Project/Beckend.Net/obj/",
+      "outputPath": "/Users/oleh/Document/Project/shop-backend/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/oleh/.nuget/NuGet/NuGet.Config"

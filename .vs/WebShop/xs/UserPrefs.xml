@@ -1,60 +1,57 @@
 ﻿<Properties StartupConfiguration="{4AF14A70-8F99-4864-8D9E-695048DD2856}|gdfg">
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <MonoDevelop.Ide.ItemProperties.WebShop PreferredExecutionTarget="/Applications/Google Chrome.app" />
-  <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
-  </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.Workbench ActiveDocument="Main/DTO/MessagesDTO.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Main/Actions/OrderActions.cs">
     <Files>
-      <File FileName="Main/Actions/DiscountActions.cs" Line="30" Column="1" />
+      <File FileName="Main/Actions/DiscountActions.cs" />
       <File FileName="Main/Actions/ComentsActions.cs" />
-      <File FileName="Main/Actions/OrderActions.cs" Line="33" Column="1" />
-      <File FileName="Main/Context/Order.cs" Line="38" Column="18" />
-      <File FileName="Main/Actions/LoginActions.cs" Line="27" Column="1" />
-      <File FileName="Program.cs" Line="77" Column="1" />
-      <File FileName="Main/ChatHub/ChatHub.cs" Line="6" Column="2" />
-      <File FileName="Main/Context/CartItem.cs" Line="1" Column="1" />
-      <File FileName="Main/Context/User.cs" Line="26" Column="30" />
-      <File FileName="Main/Actions/AdminActions.cs" Line="1" Column="1" />
-      <File FileName="Main/Actions/ProductActions.cs" Line="180" Column="1" />
-      <File FileName="Main/DTO/ProductDTO.cs" Line="30" Column="1" />
-      <File FileName="Main/Context/Characteristics.cs" Line="13" Column="1" />
-      <File FileName="Main/DBContext/DBContext.cs" Line="43" Column="24" />
-      <File FileName="Main/Context/Coments.cs" Line="26" Column="42" />
-      <File FileName="Main/Context/Message.cs" Line="16" Column="40" />
-      <File FileName="Main/Context/Product.cs" Line="43" Column="21" />
-      <File FileName="Main/BusinessLogic/LoggerBL.cs" Line="19" Column="1" />
-      <File FileName="Main/BusinessLogic/FilterActionsBL.cs" Line="1" Column="1" />
-      <File FileName="Main/BusinessLogic/LogInActionsBL.cs" Line="35" Column="18" />
-      <File FileName="../../../Projects/WebShop/src/app/pages/account/addDeliveryOptions/field-error-display/field-error-display.component.html" Line="4" Column="20" />
-      <File FileName="../../../Projects/WebShop/src/app/pages/account/addUserInfo/field-error-display/field-error-display.component.scss" Line="1" Column="7" />
-      <File FileName="../../../Projects/WebShop/src/app/pages/account/addDeliveryOptions/field-error-display/field-error-display.component.scss" Line="1" Column="7" />
-      <File FileName="Main/BusinessLogic/DiscountActionsBL.cs" Line="12" Column="1" />
-      <File FileName="Main/BusinessLogic/UserActionsBL.cs" Line="1" Column="1" />
-      <File FileName="Main/Actions/UserActions.cs" Line="95" Column="10" />
-      <File FileName="Main/BusinessLogic/OrderActionsBL.cs" Line="1" Column="1" />
-      <File FileName="Main/Actions/MessageActions.cs" Line="24" Column="38" />
-      <File FileName="Main/Actions/CategoryActions.cs" Line="21" Column="5" />
-      <File FileName="Main/Actions/MoneyOnBalanceActions.cs" Line="55" Column="1" />
-      <File FileName="Main/BusinessLogic/MessageActionsBl.cs" Line="11" Column="49" />
-      <File FileName="Main/Interfaces/IMessageActionsBL.cs" Line="16" Column="62" />
-      <File FileName="Main/Interfaces/IDiscountActionsBL.cs" Line="9" Column="1" />
-      <File FileName="Main/BusinessLogic/PromocodeActionsBL.cs" Line="9" Column="37" />
-      <File FileName="Main/BusinessLogic/ProductActionsBL.cs" Line="20" Column="32" />
-      <File FileName="Models/GetMessagesModel.cs" Line="7" Column="6" />
-      <File FileName="Models/SendMessageModel.cs" Line="9" Column="6" />
-      <File FileName="Main/DTO/ComentsDTO.cs" Line="1" Column="1" />
-      <File FileName="Main/DTO/MessagesDTO.cs" Line="12" Column="2" />
+      <File FileName="Main/Actions/OrderActions.cs" Line="1" Column="1" />
+      <File FileName="Main/Context/Order.cs" />
+      <File FileName="Main/Actions/LoginActions.cs" />
+      <File FileName="Program.cs" />
+      <File FileName="Main/Context/CartItem.cs" />
+      <File FileName="Main/Context/User.cs" />
+      <File FileName="Main/Actions/AdminActions.cs" />
+      <File FileName="Main/Actions/ProductActions.cs" />
+      <File FileName="Main/DTO/ProductDTO.cs" />
+      <File FileName="Main/Context/Characteristics.cs" />
+      <File FileName="Main/DBContext/DBContext.cs" />
+      <File FileName="Main/Context/Coments.cs" />
+      <File FileName="Main/Context/Message.cs" />
+      <File FileName="Main/Context/Product.cs" />
+      <File FileName="Main/BusinessLogic/LoggerBL.cs" />
+      <File FileName="Main/BusinessLogic/FilterActionsBL.cs" />
+      <File FileName="Main/BusinessLogic/LogInActionsBL.cs" />
+      <File FileName="../../../Projects/WebShop/src/app/pages/account/addDeliveryOptions/field-error-display/field-error-display.component.html" />
+      <File FileName="../../../Projects/WebShop/src/app/pages/account/addUserInfo/field-error-display/field-error-display.component.scss" />
+      <File FileName="../../../Projects/WebShop/src/app/pages/account/addDeliveryOptions/field-error-display/field-error-display.component.scss" />
+      <File FileName="Main/BusinessLogic/DiscountActionsBL.cs" />
+      <File FileName="Main/BusinessLogic/UserActionsBL.cs" />
+      <File FileName="Main/Actions/UserActions.cs" />
+      <File FileName="Main/BusinessLogic/OrderActionsBL.cs" />
+      <File FileName="Main/Actions/MessageActions.cs" />
+      <File FileName="Main/Actions/CategoryActions.cs" />
+      <File FileName="Main/Actions/MoneyOnBalanceActions.cs" />
+      <File FileName="Main/BusinessLogic/MessageActionsBl.cs" />
+      <File FileName="Main/Interfaces/IMessageActionsBL.cs" />
+      <File FileName="Main/Interfaces/IDiscountActionsBL.cs" />
+      <File FileName="Main/BusinessLogic/PromocodeActionsBL.cs" />
+      <File FileName="Main/BusinessLogic/ProductActionsBL.cs" />
+      <File FileName="Models/GetMessagesModel.cs" />
+      <File FileName="Models/SendMessageModel.cs" />
+      <File FileName="Main/DTO/ComentsDTO.cs" />
+      <File FileName="Main/DTO/MessagesDTO.cs" />
+      <File FileName="../../../../../usr/local/share/dotnet/sdk/7.0.200/Microsoft.Common.CurrentVersion.targets" Line="4752" Column="10" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="WebShop" expanded="True">
-            <Node name="WebShop" expanded="True" selected="True">
+            <Node name="WebShop" expanded="True">
               <Node name="Main" expanded="True">
-                <Node name="Actions" expanded="True" />
+                <Node name="Actions" expanded="True">
+                  <Node name="OrderActions.cs" selected="True" />
+                </Node>
                 <Node name="BusinessLogic" expanded="True" />
+                <Node name="DTO" expanded="True" />
               </Node>
             </Node>
           </Node>
@@ -63,4 +60,10 @@
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.ItemProperties.WebShop PreferredExecutionTarget="/Applications/Google Chrome.app" />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
 </Properties>

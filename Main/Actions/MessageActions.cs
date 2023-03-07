@@ -5,7 +5,7 @@ using WebShop.Main.Conext;
 using WebShop.Main.Context;
 using System.Security.Claims;
 using WebShop.Main.DBContext;
-using WebShop.Main.ChatHubs;
+using WebShop.Main.Hubs;
 using Microsoft.AspNetCore.Authorization;
 using WebShop.Main.Interfaces;
 using WebShop.Models;
@@ -17,13 +17,13 @@ namespace WebShop.Main.Actions
     [Route("MessageActions")]
     public class MessageActions : ControllerBase
     {
-        private readonly IHubContext<ChatHubs.ChatHub> _hubContext;
+        private readonly IHubContext<Hubs.ChatHub> _hubContext;
 
         private readonly IMessageActionsBl _messageActionsBl;
 
         private readonly ILoggerBL _loggerBL;
 
-        public MessageActions(IHubContext<ChatHubs.ChatHub> hubContext, IMessageActionsBl messageActionsBl, ILoggerBL loggerBL)
+        public MessageActions(IHubContext<Hubs.ChatHub> hubContext, IMessageActionsBl messageActionsBl, ILoggerBL loggerBL)
         {
             _hubContext = hubContext;
             _messageActionsBl = messageActionsBl;
@@ -44,7 +44,7 @@ namespace WebShop.Main.Actions
 
                 if (user != null)
                 {
-                    await _messageActionsBl.AddMessage(UserId, model.Message, model.ProductId, user.Name);
+                    await _messageActionsBl.AddMessage(UserId, model.Message, model.ProductId);
 
                     await _hubContext.Clients.All.SendAsync("ReceiveOne", model.Message, user.Name);
 

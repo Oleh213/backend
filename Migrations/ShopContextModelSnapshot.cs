@@ -424,10 +424,6 @@ namespace WebShop.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("MessageId");
 
                     b.HasIndex("ProductId");

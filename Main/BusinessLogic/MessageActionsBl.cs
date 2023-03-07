@@ -22,9 +22,9 @@ namespace WebShop.Main.BusinessLogic
             return await _context.users.FirstOrDefaultAsync(x => x.UserId == userId);
         }
 
-        public async Task<string> AddMessage(Guid UserId, string Message, Guid ProductId, string Name)
+        public async Task<string> AddMessage(Guid UserId, string Message, Guid ProductId)
         {
-            _context.messages.Add(new Context.Message { UserId = UserId, MessageId = Guid.NewGuid(), MessageText = Message, ProductId = ProductId, UserName = Name, DateTime = DateTime.Now });
+            _context.messages.Add(new Context.Message { UserId = UserId, MessageId = Guid.NewGuid(), MessageText = Message, ProductId = ProductId, DateTime = DateTime.Now });
 
             await _context.SaveChangesAsync();
 
@@ -40,9 +40,13 @@ namespace WebShop.Main.BusinessLogic
         {
             var messagesDTO = new List<MessagesDTO>();
 
+            var users = _context.users;
+
             foreach (var item in messages)
             {
-                messagesDTO.Add(new MessagesDTO { Message = item.MessageText, UserName = item.UserName, DataTime = item.DateTime });
+                var userName = users.FirstOrDefault(x=> x.UserId == item.UserId).Name;
+
+                messagesDTO.Add(new MessagesDTO { Message = item.MessageText, UserName = userName, DataTime = item.DateTime });
             }
 
             return messagesDTO;

@@ -12,6 +12,9 @@ using WebShop.Main.Interfaces;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using WebShop.Models;
+using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
+using WebShop.Main.Hubs;
 
 namespace Shop.Main.Actions
 {
@@ -23,10 +26,13 @@ namespace Shop.Main.Actions
 
         private readonly ILoggerBL _loggerBL;
 
-        public OrderActions(IOrderActionsBL orderActionsBL, ILoggerBL loggerBL)
+        private readonly IHubContext<OrderHub> _hubContext;
+
+        public OrderActions(IOrderActionsBL orderActionsBL, ILoggerBL loggerBL, IHubContext<OrderHub> hubContext)
         {
             _orderActionsBL = orderActionsBL;
             _loggerBL = loggerBL;
+            _hubContext = hubContext;
         }
 
         private Guid UserId => Guid.Parse(User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value);
@@ -39,9 +45,11 @@ namespace Shop.Main.Actions
             {
                 var user = await _orderActionsBL.GetUser(UserId);
 
+                var products = await _orderActionsBL.GetUserProducts(user);
+
                 var totalPrice = await _orderActionsBL.GetTotalPrice(user, model.Promocode);
 
-                if (model.Card != null)
+                if (model.Card.CardNumber.Length > 0 && model.Card.Cvv.Length > 0 && model.Card.ExpiredDate.Length > 0)
                 {
                     var card = await _orderActionsBL.GetCartd(model.Card.CardNumber, model.Card.ExpiredDate, model.Card.Cvv);
 
@@ -93,7 +101,6 @@ namespace Shop.Main.Actions
                         return NotFound(resError);
                     }
                 }
-                var products = user.CartItems.Select(ci => ci.Product).ToList();
 
                 if (!await _orderActionsBL.CheckCountOfProducts(products, user))
                 {
@@ -117,6 +124,7 @@ namespace Shop.Main.Actions
                     Data = $"The order was successful create"
                 };
 
+
                 _loggerBL.AddLog(LoggerLevel.Info, $"User:'{UserId}' bought products!");
                 return Ok(resOk);
             }
@@ -132,11 +140,66 @@ namespace Shop.Main.Actions
         [HttpGet("ShowBuyList")]
         public async Task<IActionResult> ShowBuyList()
         {
-            var orderedProductIds = await _orderActionsBL.ShowOrders(UserId);
+            try
+            {
+                var orderedProductIds = await _orderActionsBL.ShowOrders(UserId);
 
-            return Ok(orderedProductIds);
+                return Ok(orderedProductIds);
+            }
+            catch (Exception ex)
+            {
+                _loggerBL.AddLog(LoggerLevel.Error, ex.Message);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
+        [Authorize]
+        [HttpGet("GetOrderInfo")]
+        public async Task<IActionResult> GetOrderInfo([FromQuery] OrderIdModel model)
+        {
+            try
+            {
+                var order = await _orderActionsBL.GetOrder(model.OrderId);
+
+                if (order !=null)
+                {
+                    return Ok(order.Info);
+                }
+                else
+                    return NotFound();
+
+            }
+            catch (Exception ex)
+            {
+                _loggerBL.AddLog(LoggerLevel.Error, ex.Message);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [Authorize]
+        [HttpPost("ChangeOrderInformation")]
+        public async Task<IActionResult> ChangeOrderInformation([FromBody] ChangeOrderInformationModel model)
+        {
+            try
+            {
+                var statys = await _orderActionsBL.ChangeOrderInformation(model.OrderId, model);
+
+                if (statys)
+                {
+                    return Ok();
+                }
+                else
+                    return NotFound();
+            }
+            catch (Exception ex)
+            {
+                _loggerBL.AddLog(LoggerLevel.Error, ex.Message);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
 
         [HttpPost("ChangeOrderStatus")]
         public async Task<IActionResult> ChangeOrderStatus([FromBody] ChangeOrderStatusModel model)

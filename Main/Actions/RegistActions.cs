@@ -50,7 +50,7 @@ namespace Shop.Main.Actions
                     {
                         IsError = true,
                         ErrorMessage = "401",
-                        Data = $"This email connect to other user, enter other email!"
+                        Data = $"This email connect to other user!"
                     };
                     return Unauthorized(resEr2);
                 }

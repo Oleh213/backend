@@ -13,7 +13,7 @@ namespace WebShop.Main.Interfaces
 
         Task<bool> CheckCountOfProducts(List<Product> products, User user);
 
-        Task<string> CreateNewOrder(List<Product> products, User user, OrderModel model, int totalPrice);
+        Task<Order> CreateNewOrder(List<Product> products, User user, OrderModel model, int totalPrice);
 
         Task<List<Order>> ShowOrders(Guid userId);
 
@@ -24,6 +24,11 @@ namespace WebShop.Main.Interfaces
         Task<List<Order>> GetNewOrders();
 
         Task<int> GetTotalPrice(User user, string promocode);
+
+        Task<List<Product>> GetUserProducts(User user);
+
+        Task<bool> ChangeOrderInformation(Guid orderId, ChangeOrderInformationModel model);
+
     }
 }
 

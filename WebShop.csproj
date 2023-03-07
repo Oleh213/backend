@@ -74,11 +74,9 @@
     <None Remove="Microsoft.IdentityModel.Tokens" />
     <None Remove="BCrypt.Net-Next" />
     <None Remove="Main\BusinessLogic\" />
-    <None Remove="Main\ChatHub\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Main\DTO\" />
     <Folder Include="Main\BusinessLogic\" />
-    <Folder Include="Main\ChatHub\" />
   </ItemGroup>
 </Project>
